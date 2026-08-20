@@ -1,7 +1,6 @@
 import java.util.Scanner;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.IntStream;
 
 public class Penny {
     public static void main(String[] args) {
@@ -15,28 +14,45 @@ public class Penny {
 
         System.out.println(divider);
         System.out.println(banner);
-        System.out.println("Hello! I'm Penny.");
-        System.out.println("What can I do for you?");
+        System.out.println("     Hello! I'm Penny.");
+        System.out.println("     What can I do for you?");
         System.out.println(divider);
-        List<String> history = new ArrayList<>();
+
+        List<Task> history = new ArrayList<>();
         Scanner scan = new Scanner(System.in);
         String prevLine = scan.nextLine();
-        while (! prevLine.equals("bye")) {
+
+        while (!prevLine.equals("bye")) {
             System.out.println(divider);
+
             if (prevLine.equals("list")) {
-                IntStream.range(1, history.size() + 1)
-                        .forEach(i -> System.out.println(i + ". " + history.get(i - 1)));
-
+                System.out.println("     Here are the tasks in your list:");
+                for (int i = 0; i < history.size(); i++) {
+                    System.out.println("     " + (i + 1) + "." + history.get(i).toString());
+                }
+            } else if (prevLine.startsWith("mark ")) {
+                int index = Integer.parseInt(prevLine.substring(5).trim()) - 1;
+                Task t = history.get(index);
+                t.markAsDone();
+                System.out.println("     Nice! I've marked this task as done:");
+                System.out.println("       " + t.toString());
+            } else if (prevLine.startsWith("unmark ")) {
+                int index = Integer.parseInt(prevLine.substring(7).trim()) - 1;
+                Task t = history.get(index);
+                t.markAsUndone();
+                System.out.println("     OK, I've marked this task as not done yet:");
+                System.out.println("       " + t.toString());
+            } else {
+                history.add(new Task(prevLine));
+                System.out.println("     added: " + prevLine);
             }
-            else {
-                history.add(prevLine);
-                System.out.println("added: " + prevLine);
 
-            }
             System.out.println(divider);
             prevLine = scan.nextLine();
         }
-        System.out.println("Bye. Hope to see you again soon!");
+
+        System.out.println(divider);
+        System.out.println("     Bye. Hope to see you again soon!");
         System.out.println(divider);
     }
 }
