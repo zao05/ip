@@ -57,6 +57,17 @@ public class Penny {
                     } catch (NumberFormatException | IndexOutOfBoundsException e) {
                         throw new PennyException("To unmark a task, please provide a valid number from your list. Try: unmark 1");
                     }
+                } else if (prevLine.startsWith("delete")) {
+                    try {
+                        // Extract the index, convert to 0-based, and remove it from the ArrayList
+                        int index = Integer.parseInt(prevLine.substring(6).trim()) - 1;
+                        Task t = history.remove(index);
+                        System.out.println("     Noted. I've removed this task:");
+                        System.out.println("       " + t.toString());
+                        System.out.println("     Now you have " + history.size() + " tasks in the list.");
+                    } catch (NumberFormatException | IndexOutOfBoundsException e) {
+                        throw new PennyException("To delete a task, please provide a valid number from your list. Try: delete 1");
+                    }
                 } else if (prevLine.startsWith("todo")) {
                     String desc = prevLine.substring(4).trim();
                     if (desc.isEmpty()) {
@@ -86,7 +97,7 @@ public class Penny {
                     }
                     addTask(history, new Event(desc, times[0].trim(), times[1].trim()));
                 } else {
-                    throw new PennyException("Hmm, I don't quite understand that command. Valid commands: todo, deadline, event, list, mark, unmark, bye.");
+                    throw new PennyException("Hmm, I don't quite understand that command. Valid commands: todo, deadline, event, list, mark, unmark, delete, bye.");
                 }
             } catch (PennyException e) {
                 System.out.println("     " + e.getMessage());
