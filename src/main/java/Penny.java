@@ -3,10 +3,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Penny {
+
+    private static void addTask(List<Task> history, Task t) {
+        history.add(t);
+        System.out.println("     Got it. I've added this task:");
+        System.out.println("       " + t.toString());
+        System.out.println("     Now you have " + history.size() + " tasks in the list.");
+    }
+
     public static void main(String[] args) {
-
         String divider = "____________________________________________________________";
-
         String banner = " ___  ___  _  _  _  _  _  _ \n"
                 + "| . \\| __>| \\| || \\| || | |\n"
                 + "|  _/| _> | \\  || \\  |\\   /\n"
@@ -42,6 +48,19 @@ public class Penny {
                 t.markAsUndone();
                 System.out.println("     OK, I've marked this task as not done yet:");
                 System.out.println("       " + t.toString());
+            } else if (prevLine.startsWith("todo ")) {
+                String desc = prevLine.substring(5).trim();
+                addTask(history, new Todo(desc));
+            } else if (prevLine.startsWith("deadline ")) {
+                String body = prevLine.substring(9).trim();
+                String[] parts = body.split(" /by ");
+                addTask(history, new Deadline(parts[0], parts[1]));
+            } else if (prevLine.startsWith("event ")) {
+                String body = prevLine.substring(6).trim();
+                String[] parts = body.split(" /from ");
+                String desc = parts[0];
+                String[] times = parts[1].split(" /to ");
+                addTask(history, new Event(desc, times[0], times[1]));
             } else {
                 history.add(new Task(prevLine));
                 System.out.println("     added: " + prevLine);
@@ -54,5 +73,6 @@ public class Penny {
         System.out.println(divider);
         System.out.println("     Bye. Hope to see you again soon!");
         System.out.println(divider);
+        scan.close();
     }
 }
