@@ -8,4 +8,14 @@ public class Todo extends Task {
     public String toString() {
         return "[T]" + super.toString();
     }
+
+    /**
+     * Converts the todo task into a formatted string representation suitable for file storage.
+     *
+     * @return Formatted string prefixed with "T | ".
+     */
+    @Override
+    public String toFileFormat() {
+        return "T | " + super.toFileFormat();
+    }
 }
