@@ -10,4 +10,14 @@ public class Deadline extends Task {
     public String toString() {
         return "[D]" + super.toString() + " (by: " + by + ")";
     }
+
+    /**
+     * Converts the deadline task into a formatted string representation suitable for file storage.
+     *
+     * @return Formatted string prefixed with "D | " and ending with " | [by]".
+     */
+    @Override
+    public String toFileFormat() {
+        return "D | " + super.toFileFormat() + " | " + this.by;
+    }
 }

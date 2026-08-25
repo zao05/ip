@@ -12,4 +12,14 @@ public class Event extends Task {
     public String toString() {
         return "[E]" + super.toString() + " (from: " + from + " to: " + to + ")";
     }
+
+    /**
+     * Converts the event task into a formatted string representation suitable for file storage.
+     *
+     * @return Formatted string prefixed with "E | " and ending with " | [from] | [to]".
+     */
+    @Override
+    public String toFileFormat() {
+        return "E | " + super.toFileFormat() + " | " + this.from + " | " + this.to;
+    }
 }

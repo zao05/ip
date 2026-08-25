@@ -23,4 +23,13 @@ public class Task {
     public String toString() {
         return "[" + getStatusIcon() + "] " + this.description;
     }
+
+    /**
+     * Converts the task into a formatted string representation suitable for file storage.
+     *
+     * @return Formatted string containing the completion status (1 for done, 0 for undone) and description.
+     */
+    public String toFileFormat() {
+        return (isDone ? "1" : "0") + " | " + this.description;
+    }
 }
