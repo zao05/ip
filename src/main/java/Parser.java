@@ -2,30 +2,45 @@ import java.time.LocalDate;
 
 /**
  * Deals with making sense of user commands.
- * Parses raw text input into command types, task objects, indices, and dates.
+ * Parses raw text input into executable Command objects.
  */
 public class Parser {
 
     /**
-     * Extracts the CommandType from the full user input string.
+     * Parses the full user command string and returns the corresponding executable Command.
      *
      * @param fullCommand The raw line of text entered by the user.
-     * @return The corresponding CommandType.
+     * @return The executable Command object.
+     * @throws PennyException If the command word is unknown or the arguments are malformed.
      */
-    public static CommandType parseCommand(String fullCommand) {
-        String[] parts = fullCommand.trim().split(" ", 2);
-        return CommandType.fromString(parts[0]);
-    }
+    public static Command parse(String fullCommand) throws PennyException {
+        String trimmed = fullCommand.trim();
+        String[] parts = trimmed.split(" ", 2);
+        String commandWord = parts[0].toLowerCase();
+        String args = parts.length > 1 ? parts[1].trim() : "";
 
-    /**
-     * Extracts the arguments portion of the user command (everything following the command word).
-     *
-     * @param fullCommand The raw line of text entered by the user.
-     * @return The argument string, or an empty string if no arguments are provided.
-     */
-    public static String getArguments(String fullCommand) {
-        String[] parts = fullCommand.trim().split(" ", 2);
-        return parts.length > 1 ? parts[1].trim() : "";
+        switch (commandWord) {
+        case "bye":
+            return new ExitCommand();
+        case "list":
+            return new ListCommand();
+        case "mark":
+            return new MarkCommand(parseTaskIndex(fullCommand, "mark"));
+        case "unmark":
+            return new UnmarkCommand(parseTaskIndex(fullCommand, "unmark"));
+        case "delete":
+            return new DeleteCommand(parseTaskIndex(fullCommand, "delete"));
+        case "todo":
+            return new AddCommand(parseTodo(args));
+        case "deadline":
+            return new AddCommand(parseDeadline(args));
+        case "event":
+            return new AddCommand(parseEvent(args));
+        case "on":
+            return new OnCommand(parseDateQuery(args));
+        default:
+            throw new PennyException("Hmm, I don't quite understand that command. Valid commands: todo, deadline, event, list, mark, unmark, delete, on, bye.");
+        }
     }
 
     /**
@@ -33,28 +48,22 @@ public class Parser {
      *
      * @param fullCommand The raw command string.
      * @param keyword The command keyword (e.g., "mark", "unmark", "delete").
-     * @param listSize The current number of tasks in the list.
      * @return The 0-based index of the target task.
-     * @throws PennyException If the task number is missing, non-numeric, or out of range.
+     * @throws PennyException If the task number is missing or non-numeric.
      */
-    public static int parseTaskIndex(String fullCommand, String keyword, int listSize) throws PennyException {
-        if (listSize == 0) {
-            throw new PennyException("Your task list is empty. Add some tasks first!");
-        }
+    public static int parseTaskIndex(String fullCommand, String keyword) throws PennyException {
         String argument = fullCommand.substring(keyword.length()).trim();
         if (argument.isEmpty()) {
             throw new PennyException("Please specify a task number. Try: " + keyword + " 1");
         }
         try {
             int index = Integer.parseInt(argument) - 1;
-            if (index < 0 || index >= listSize) {
-                throw new IndexOutOfBoundsException();
+            if (index < 0) {
+                throw new PennyException("Invalid task number: '" + argument + "'. Please enter a positive integer.");
             }
             return index;
         } catch (NumberFormatException e) {
             throw new PennyException("Invalid task number: '" + argument + "'. Please enter a positive integer.");
-        } catch (IndexOutOfBoundsException e) {
-            throw new PennyException("Task number " + argument + " is out of range. You currently have " + listSize + " task(s).");
         }
     }
 

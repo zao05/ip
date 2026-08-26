@@ -5,7 +5,8 @@ import java.util.List;
 
 /**
  * Represents and manages the collection of tasks in the Penny application.
- * Provides operations to add, delete, mark, unmark, retrieve, and filter tasks.
+ * Provides operations to add, delete, mark, unmark, retrieve, and filter tasks,
+ * ensuring robust index bounds validation.
  */
 public class TaskList {
 
@@ -41,8 +42,10 @@ public class TaskList {
      *
      * @param index The 0-based index of the task to remove.
      * @return The removed Task.
+     * @throws PennyException If the index is out of bounds or the list is empty.
      */
-    public Task delete(int index) {
+    public Task delete(int index) throws PennyException {
+        validateIndex(index);
         return this.tasks.remove(index);
     }
 
@@ -51,8 +54,10 @@ public class TaskList {
      *
      * @param index The 0-based index of the task.
      * @return The task at the specified index.
+     * @throws PennyException If the index is out of bounds or the list is empty.
      */
-    public Task get(int index) {
+    public Task get(int index) throws PennyException {
+        validateIndex(index);
         return this.tasks.get(index);
     }
 
@@ -61,8 +66,10 @@ public class TaskList {
      *
      * @param index The 0-based index of the task to mark.
      * @return The task that was marked done.
+     * @throws PennyException If the index is out of bounds or the list is empty.
      */
-    public Task mark(int index) {
+    public Task mark(int index) throws PennyException {
+        validateIndex(index);
         Task task = this.tasks.get(index);
         task.markAsDone();
         return task;
@@ -73,11 +80,28 @@ public class TaskList {
      *
      * @param index The 0-based index of the task to unmark.
      * @return The task that was unmarked.
+     * @throws PennyException If the index is out of bounds or the list is empty.
      */
-    public Task unmark(int index) {
+    public Task unmark(int index) throws PennyException {
+        validateIndex(index);
         Task task = this.tasks.get(index);
         task.markAsUndone();
         return task;
+    }
+
+    /**
+     * Validates that the provided index is within the valid bounds of the task list.
+     *
+     * @param index The 0-based index to validate.
+     * @throws PennyException If the task list is empty or the index is out of bounds.
+     */
+    private void validateIndex(int index) throws PennyException {
+        if (this.tasks.isEmpty()) {
+            throw new PennyException("Your task list is empty. Add some tasks first!");
+        }
+        if (index < 0 || index >= this.tasks.size()) {
+            throw new PennyException("Task number " + (index + 1) + " is out of range. You currently have " + this.tasks.size() + " task(s).");
+        }
     }
 
     /**
