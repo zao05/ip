@@ -158,6 +158,23 @@ public class Ui {
     }
 
     /**
+     * Displays tasks matching a keyword search query.
+     *
+     * @param matchingTasks The tasks whose description matches the keyword.
+     * @param keyword The search keyword.
+     */
+    public void showMatchingTasks(List<Task> matchingTasks, String keyword) {
+        if (matchingTasks.isEmpty()) {
+            System.out.println("     No matching tasks found for keyword: '" + keyword + "'.");
+        } else {
+            System.out.println("     Here are the matching tasks in your list:");
+            for (int i = 0; i < matchingTasks.size(); i++) {
+                System.out.println("     " + (i + 1) + "." + matchingTasks.get(i).toString());
+            }
+        }
+    }
+
+    /**
      * Closes the scanner resource.
      */
     public void close() {

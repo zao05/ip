@@ -5,6 +5,7 @@ import penny.command.AddCommand;
 import penny.command.Command;
 import penny.command.DeleteCommand;
 import penny.command.ExitCommand;
+import penny.command.FindCommand;
 import penny.command.ListCommand;
 import penny.command.MarkCommand;
 import penny.command.OnCommand;
@@ -59,6 +60,8 @@ public class Parser {
             return new AddCommand(parseEvent(args));
         case "on":
             return new OnCommand(parseDateQuery(args));
+        case "find":
+            return new FindCommand(parseFindQuery(args));
         default:
             throw new PennyException("Hmm, I don't quite understand that command. "
                     + "Valid commands: todo, deadline, event, list, mark, unmark, delete, on, bye.");
@@ -204,5 +207,22 @@ public class Parser {
             throw new PennyException("Please specify a date to search for. Try: on 2019-10-15 or on 2/12/2019");
         }
         return Time.parseDate(args);
+    }
+
+    /**
+     * Parses the search keyword argument for the 'find' command.
+     *
+     * @param args The search keyword string.
+     * @return The validated search keyword.
+     * @throws PennyException If the keyword is empty or contains reserved characters.
+     */
+    public static String parseFindQuery(String args) throws PennyException {
+        if (args.isEmpty()) {
+            throw new PennyException("Please specify a keyword to search for. Try: find book");
+        }
+        if (args.contains("|")) {
+            throw new PennyException("Search keyword cannot contain the '|' character as it is reserved for data storage.");
+        }
+        return args;
     }
 }
