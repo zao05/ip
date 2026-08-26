@@ -1,4 +1,3 @@
-import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -14,7 +13,7 @@ public class Penny {
 
     /**
      * Saves the current task list to disk via the storage component.
-     * Reports any I/O or security permissions issues via Ui.
+     * Reports any persistence issues via Ui.
      *
      * @param storage The Storage instance responsible for file persistence.
      * @param history The current list of tasks to save.
@@ -23,10 +22,8 @@ public class Penny {
     private static void saveTasks(Storage storage, List<Task> history, Ui ui) {
         try {
             storage.save(history);
-        } catch (IOException e) {
-            ui.showError("Warning: Failed to save tasks to file: " + e.getMessage());
-        } catch (SecurityException e) {
-            ui.showError("Warning: Permission denied when saving tasks to file: " + e.getMessage());
+        } catch (PennyException e) {
+            ui.showError("Warning: " + e.getMessage());
         }
     }
 
@@ -65,11 +62,8 @@ public class Penny {
         List<Task> history;
         try {
             history = storage.load();
-        } catch (IOException e) {
+        } catch (PennyException e) {
             ui.showLoadingError(e.getMessage());
-            history = new ArrayList<>();
-        } catch (SecurityException e) {
-            ui.showError("Warning: Permission denied when accessing storage file. Starting with an empty list.");
             history = new ArrayList<>();
         }
 
