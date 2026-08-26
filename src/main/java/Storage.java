@@ -13,6 +13,15 @@ public class Storage {
     private final Path filePath;
 
     /**
+     * Constructs a Storage object configured with a file path string.
+     *
+     * @param filePath The path of the file.
+     */
+    public Storage(String filePath) {
+        this.filePath = Paths.get(filePath);
+    }
+
+    /**
      * Constructs a Storage object configured with an OS-independent relative path.
      *
      * @param first The primary directory or path segment.
@@ -29,6 +38,16 @@ public class Storage {
      */
     public Storage(Path filePath) {
         this.filePath = filePath;
+    }
+
+    /**
+     * Saves the tasks from a {@link TaskList} to the storage file on the hard disk.
+     *
+     * @param taskList The TaskList to save.
+     * @throws PennyException If an I/O or security error occurs when writing to the file.
+     */
+    public void save(TaskList taskList) throws PennyException {
+        save(taskList.getAllTasks());
     }
 
     /**

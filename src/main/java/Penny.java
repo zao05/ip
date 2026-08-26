@@ -1,107 +1,115 @@
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Main class for the Penny chatbot application.
- * Manages user interactions, command parsing, date/time task management, and file storage.
+ * Manages chatbot lifecycle and coordinates Ui, Storage, TaskList, and Parser components.
  */
 public class Penny {
 
     private static final DateTimeFormatter DISPLAY_DATE_FORMATTER = DateTimeFormatter.ofPattern("MMM d yyyy");
 
+    private final Storage storage;
+    private final TaskList tasks;
+    private final Ui ui;
+
     /**
-     * Saves the current task list to disk via the storage component.
-     * Reports any persistence issues via Ui.
+     * Constructs a Penny chatbot instance with a specified storage file path.
      *
-     * @param storage The Storage instance responsible for file persistence.
-     * @param history The current list of tasks to save.
-     * @param ui The Ui instance used to display error messages.
+     * @param filePath The file path string to the storage file (e.g., "data/penny.txt").
      */
-    private static void saveTasks(Storage storage, List<Task> history, Ui ui) {
+    public Penny(String filePath) {
+        this.ui = new Ui();
+        this.storage = new Storage(filePath);
+        TaskList loadedTasks;
         try {
-            storage.save(history);
-        } catch (PennyException e) {
-            ui.showError("Warning: " + e.getMessage());
-        }
-    }
-
-    private static void addTask(List<Task> history, Task t, Storage storage, Ui ui) {
-        history.add(t);
-        ui.showTaskAdded(t, history.size());
-        saveTasks(storage, history, ui);
-    }
-
-    public static void main(String[] args) {
-        Ui ui = new Ui();
-        ui.showWelcome();
-
-        Storage storage = new Storage("data", "penny.txt");
-        List<Task> history;
-        try {
-            history = storage.load();
+            loadedTasks = new TaskList(storage.load());
         } catch (PennyException e) {
             ui.showLoadingError(e.getMessage());
-            history = new ArrayList<>();
+            loadedTasks = new TaskList();
         }
+        this.tasks = loadedTasks;
+    }
 
-        String prevLine = ui.readCommand();
+    /**
+     * Constructs a Penny chatbot instance with OS-independent path segments.
+     *
+     * @param first The primary directory or path segment.
+     * @param more Additional path segments if any.
+     */
+    public Penny(String first, String... more) {
+        this.ui = new Ui();
+        this.storage = new Storage(first, more);
+        TaskList loadedTasks;
+        try {
+            loadedTasks = new TaskList(storage.load());
+        } catch (PennyException e) {
+            ui.showLoadingError(e.getMessage());
+            loadedTasks = new TaskList();
+        }
+        this.tasks = loadedTasks;
+    }
 
-        while (!prevLine.equals("bye")) {
+    /**
+     * Executes the main command processing loop of the chatbot.
+     */
+    public void run() {
+        ui.showWelcome();
+        String commandString = ui.readCommand();
+
+        while (!commandString.equals("bye")) {
             ui.showLine();
 
             try {
-                CommandType command = Parser.parseCommand(prevLine);
-                String argsString = Parser.getArguments(prevLine);
+                CommandType command = Parser.parseCommand(commandString);
+                String argsString = Parser.getArguments(commandString);
 
                 switch (command) {
                     case LIST:
-                        ui.showTaskList(history);
+                        ui.showTaskList(tasks.getAllTasks());
                         break;
                     case MARK:
-                        int markIndex = Parser.parseTaskIndex(prevLine, "mark", history.size());
-                        Task taskToMark = history.get(markIndex);
-                        taskToMark.markAsDone();
+                        int markIndex = Parser.parseTaskIndex(commandString, "mark", tasks.size());
+                        Task taskToMark = tasks.mark(markIndex);
                         ui.showTaskMarked(taskToMark);
-                        saveTasks(storage, history, ui);
+                        saveTasks();
                         break;
                     case UNMARK:
-                        int unmarkIndex = Parser.parseTaskIndex(prevLine, "unmark", history.size());
-                        Task taskToUnmark = history.get(unmarkIndex);
-                        taskToUnmark.markAsUndone();
+                        int unmarkIndex = Parser.parseTaskIndex(commandString, "unmark", tasks.size());
+                        Task taskToUnmark = tasks.unmark(unmarkIndex);
                         ui.showTaskUnmarked(taskToUnmark);
-                        saveTasks(storage, history, ui);
+                        saveTasks();
                         break;
                     case DELETE:
-                        int deleteIndex = Parser.parseTaskIndex(prevLine, "delete", history.size());
-                        Task removedTask = history.remove(deleteIndex);
-                        ui.showTaskDeleted(removedTask, history.size());
-                        saveTasks(storage, history, ui);
+                        int deleteIndex = Parser.parseTaskIndex(commandString, "delete", tasks.size());
+                        Task removedTask = tasks.delete(deleteIndex);
+                        ui.showTaskDeleted(removedTask, tasks.size());
+                        saveTasks();
                         break;
                     case TODO:
                         Todo todo = Parser.parseTodo(argsString);
-                        addTask(history, todo, storage, ui);
+                        tasks.add(todo);
+                        ui.showTaskAdded(todo, tasks.size());
+                        saveTasks();
                         break;
                     case DEADLINE:
                         Deadline deadline = Parser.parseDeadline(argsString);
-                        addTask(history, deadline, storage, ui);
+                        tasks.add(deadline);
+                        ui.showTaskAdded(deadline, tasks.size());
+                        saveTasks();
                         break;
                     case EVENT:
                         Event event = Parser.parseEvent(argsString);
-                        addTask(history, event, storage, ui);
+                        tasks.add(event);
+                        ui.showTaskAdded(event, tasks.size());
+                        saveTasks();
                         break;
                     case ON:
                         LocalDate targetDate = Parser.parseDateQuery(argsString);
-                        String formattedTargetDate = targetDate.format(DISPLAY_DATE_FORMATTER);
-
-                        List<Task> matchingTasks = new ArrayList<>();
-                        for (Task task : history) {
-                            if (task.isOnDate(targetDate)) {
-                                matchingTasks.add(task);
-                            }
-                        }
-                        ui.showTasksOnDate(matchingTasks, formattedTargetDate);
+                        String formattedDate = targetDate.format(DISPLAY_DATE_FORMATTER);
+                        List<Task> matchingTasks = tasks.findTasksOnDate(targetDate);
+                        ui.showTasksOnDate(matchingTasks, formattedDate);
                         break;
                     default:
                         throw new PennyException("Hmm, I don't quite understand that command. Valid commands: todo, deadline, event, list, mark, unmark, delete, on, bye.");
@@ -111,10 +119,25 @@ public class Penny {
             }
 
             ui.showLine();
-            prevLine = ui.readCommand();
+            commandString = ui.readCommand();
         }
 
         ui.showGoodbye();
         ui.close();
+    }
+
+    /**
+     * Saves the current tasks to disk, reporting any error via Ui.
+     */
+    private void saveTasks() {
+        try {
+            storage.save(tasks);
+        } catch (PennyException e) {
+            ui.showError("Warning: " + e.getMessage());
+        }
+    }
+
+    public static void main(String[] args) {
+        new Penny("data", "penny.txt").run();
     }
 }
