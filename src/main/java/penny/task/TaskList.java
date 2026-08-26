@@ -103,7 +103,8 @@ public class TaskList {
             throw new PennyException("Your task list is empty. Add some tasks first!");
         }
         if (index < 0 || index >= this.tasks.size()) {
-            throw new PennyException("Task number " + (index + 1) + " is out of range. You currently have " + this.tasks.size() + " task(s).");
+            throw new PennyException("Task number " + (index + 1) + " is out of range. "
+                    + "You currently have " + this.tasks.size() + " task(s).");
         }
     }
 

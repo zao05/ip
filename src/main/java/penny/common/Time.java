@@ -27,6 +27,8 @@ public class Time {
 
     private static final DateTimeFormatter DISPLAY_DATE_FORMATTER = DateTimeFormatter.ofPattern("MMM d yyyy");
     private static final DateTimeFormatter DISPLAY_TIME_FORMATTER = DateTimeFormatter.ofPattern("h:mma");
+    private static final DateTimeFormatter STORAGE_DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    private static final DateTimeFormatter STORAGE_TIME_FORMATTER = DateTimeFormatter.ofPattern("HHmm");
 
     private final LocalDate date;
     private final LocalTime time;
@@ -45,9 +47,9 @@ public class Time {
 
         for (DateTimeFormatter formatter : DATE_TIME_FORMATTERS) {
             try {
-                LocalDateTime ldt = LocalDateTime.parse(trimmed, formatter);
-                parsedDate = ldt.toLocalDate();
-                parsedTime = ldt.toLocalTime();
+                LocalDateTime dateTime = LocalDateTime.parse(trimmed, formatter);
+                parsedDate = dateTime.toLocalDate();
+                parsedTime = dateTime.toLocalTime();
                 isParsed = true;
                 break;
             } catch (DateTimeParseException ignored) {
@@ -148,10 +150,10 @@ public class Time {
      */
     public String toFileFormat() {
         if (this.time != null) {
-            return this.date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) + " "
-                    + this.time.format(DateTimeFormatter.ofPattern("HHmm"));
+            return this.date.format(STORAGE_DATE_FORMATTER) + " "
+                    + this.time.format(STORAGE_TIME_FORMATTER);
         }
-        return this.date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        return this.date.format(STORAGE_DATE_FORMATTER);
     }
 
     /**
