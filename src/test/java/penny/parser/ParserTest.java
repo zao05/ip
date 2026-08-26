@@ -1,6 +1,5 @@
 package penny.parser;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -10,6 +9,7 @@ import penny.command.AddCommand;
 import penny.command.Command;
 import penny.command.DeleteCommand;
 import penny.command.ExitCommand;
+import penny.command.FindCommand;
 import penny.command.ListCommand;
 import penny.command.MarkCommand;
 import penny.command.OnCommand;
@@ -141,6 +141,28 @@ public class ParserTest {
     public void parse_onValidDate_onCommandCreated() throws PennyException {
         Command command = Parser.parse("on 2019-10-15");
         assertInstanceOf(OnCommand.class, command);
+    }
+
+    @Test
+    public void parse_findValidKeyword_findCommandCreated() throws PennyException {
+        Command command = Parser.parse("find book");
+        assertInstanceOf(FindCommand.class, command);
+    }
+
+    @Test
+    public void parse_findEmptyKeyword_exceptionThrown() {
+        PennyException exception = assertThrows(PennyException.class, () -> {
+            Parser.parse("find   ");
+        });
+        assertTrue(exception.getMessage().contains("Please specify a keyword to search for"));
+    }
+
+    @Test
+    public void parse_findReservedDelimiterPipe_exceptionThrown() {
+        PennyException exception = assertThrows(PennyException.class, () -> {
+            Parser.parse("find book | novel");
+        });
+        assertTrue(exception.getMessage().contains("reserved for data storage"));
     }
 
     @Test

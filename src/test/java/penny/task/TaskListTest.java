@@ -13,7 +13,7 @@ import penny.common.PennyException;
 
 /**
  * Unit test suite for {@link TaskList}.
- * Tests task operations including delete, mark, unmark, and date-based filtering.
+ * Tests task operations including delete, mark, unmark, date-based filtering, and keyword search.
  */
 public class TaskListTest {
 
@@ -93,6 +93,26 @@ public class TaskListTest {
     public void findTasksOnDate_nonMatchingDate_returnsEmptyList() {
         LocalDate nonMatchingDate = LocalDate.of(2025, 1, 1);
         List<Task> matchingTasks = taskList.findTasksOnDate(nonMatchingDate);
+        assertTrue(matchingTasks.isEmpty());
+    }
+
+    @Test
+    public void findTasksByKeyword_matchingKeyword_returnsMatchingTasks() {
+        List<Task> matchingTasks = taskList.findTasksByKeyword("book");
+        assertEquals(1, matchingTasks.size());
+        assertEquals(sampleTodo, matchingTasks.get(0));
+    }
+
+    @Test
+    public void findTasksByKeyword_caseInsensitive_returnsMatchingTasks() {
+        List<Task> matchingTasks = taskList.findTasksByKeyword("BOOK");
+        assertEquals(1, matchingTasks.size());
+        assertEquals(sampleTodo, matchingTasks.get(0));
+    }
+
+    @Test
+    public void findTasksByKeyword_nonMatchingKeyword_returnsEmptyList() {
+        List<Task> matchingTasks = taskList.findTasksByKeyword("nonexistent");
         assertTrue(matchingTasks.isEmpty());
     }
 }
