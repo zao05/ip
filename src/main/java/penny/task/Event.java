@@ -9,7 +9,10 @@ import penny.common.Time;
  */
 public class Event extends Task {
 
+    /** The start date and optional time of the event. */
     protected Time from;
+
+    /** The end date and optional time of the event. */
     protected Time to;
 
     /**
@@ -39,14 +42,30 @@ public class Event extends Task {
         this.to = to;
     }
 
+    /**
+     * Returns the start Time of the event.
+     *
+     * @return The start {@link Time}.
+     */
     public Time getFrom() {
         return this.from;
     }
 
+    /**
+     * Returns the end Time of the event.
+     *
+     * @return The end {@link Time}.
+     */
     public Time getTo() {
         return this.to;
     }
 
+    /**
+     * Checks if this event occurs on or spans across the specified date.
+     *
+     * @param targetDate The date to check against.
+     * @return True if targetDate falls within [startDate, endDate], false otherwise.
+     */
     @Override
     public boolean isOnDate(LocalDate targetDate) {
         LocalDate startDate = this.from.getDate();
@@ -54,11 +73,21 @@ public class Event extends Task {
         return !targetDate.isBefore(startDate) && !targetDate.isAfter(endDate);
     }
 
+    /**
+     * Formats the event task into a pipe-delimited string for disk persistence.
+     *
+     * @return Formatted file storage string (e.g., "E | 0 | meeting | 2019-10-15 1400 | 2019-10-15 1600").
+     */
     @Override
     public String toFileFormat() {
         return "E | " + (isDone ? "1" : "0") + " | " + description + " | " + from.toFileFormat() + " | " + to.toFileFormat();
     }
 
+    /**
+     * Returns the string representation of the event task for display.
+     *
+     * @return Formatted event string (e.g., "[E][ ] meeting (from: Oct 15 2019, 2:00pm to: Oct 15 2019, 4:00pm)").
+     */
     @Override
     public String toString() {
         return "[E]" + super.toString() + " (from: " + from.toString() + " to: " + to.toString() + ")";

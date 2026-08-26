@@ -14,11 +14,21 @@ public class Todo extends Task {
         super(description);
     }
 
+    /**
+     * Formats the todo task into a pipe-delimited string for disk persistence.
+     *
+     * @return Formatted file storage string (e.g., "T | 0 | read book").
+     */
     @Override
     public String toFileFormat() {
         return "T | " + (isDone ? "1" : "0") + " | " + description;
     }
 
+    /**
+     * Returns the string representation of the todo task for display.
+     *
+     * @return Formatted todo string (e.g., "[T][ ] read book").
+     */
     @Override
     public String toString() {
         return "[T]" + super.toString();
