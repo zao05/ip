@@ -33,27 +33,6 @@ public class Penny {
         saveTasks(storage, history, ui);
     }
 
-    private static int parseTaskNumber(String command, String keyword, int listSize) throws PennyException {
-        if (listSize == 0) {
-            throw new PennyException("Your task list is empty. Add some tasks first!");
-        }
-        String argument = command.substring(keyword.length()).trim();
-        if (argument.isEmpty()) {
-            throw new PennyException("Please specify a task number. Try: " + keyword + " 1");
-        }
-        try {
-            int index = Integer.parseInt(argument) - 1;
-            if (index < 0 || index >= listSize) {
-                throw new IndexOutOfBoundsException();
-            }
-            return index;
-        } catch (NumberFormatException e) {
-            throw new PennyException("Invalid task number: '" + argument + "'. Please enter a positive integer.");
-        } catch (IndexOutOfBoundsException e) {
-            throw new PennyException("Task number " + argument + " is out of range. You currently have " + listSize + " task(s).");
-        }
-    }
-
     public static void main(String[] args) {
         Ui ui = new Ui();
         ui.showWelcome();
@@ -73,103 +52,47 @@ public class Penny {
             ui.showLine();
 
             try {
-                String[] inputParts = prevLine.split(" ", 2);
-                CommandType command = CommandType.fromString(inputParts[0]);
+                CommandType command = Parser.parseCommand(prevLine);
+                String argsString = Parser.getArguments(prevLine);
 
                 switch (command) {
                     case LIST:
                         ui.showTaskList(history);
                         break;
                     case MARK:
-                        int markIndex = parseTaskNumber(prevLine, "mark", history.size());
+                        int markIndex = Parser.parseTaskIndex(prevLine, "mark", history.size());
                         Task taskToMark = history.get(markIndex);
                         taskToMark.markAsDone();
                         ui.showTaskMarked(taskToMark);
                         saveTasks(storage, history, ui);
                         break;
                     case UNMARK:
-                        int unmarkIndex = parseTaskNumber(prevLine, "unmark", history.size());
+                        int unmarkIndex = Parser.parseTaskIndex(prevLine, "unmark", history.size());
                         Task taskToUnmark = history.get(unmarkIndex);
                         taskToUnmark.markAsUndone();
                         ui.showTaskUnmarked(taskToUnmark);
                         saveTasks(storage, history, ui);
                         break;
                     case DELETE:
-                        int deleteIndex = parseTaskNumber(prevLine, "delete", history.size());
+                        int deleteIndex = Parser.parseTaskIndex(prevLine, "delete", history.size());
                         Task removedTask = history.remove(deleteIndex);
                         ui.showTaskDeleted(removedTask, history.size());
                         saveTasks(storage, history, ui);
                         break;
                     case TODO:
-                        if (inputParts.length < 2 || inputParts[1].trim().isEmpty()) {
-                            throw new PennyException("Whoops! A todo needs a description. Try: todo read a book");
-                        }
-                        String todoDesc = inputParts[1].trim();
-                        if (todoDesc.contains("|")) {
-                            throw new PennyException("Task description cannot contain the '|' character as it is reserved for data storage.");
-                        }
-                        addTask(history, new Todo(todoDesc), storage, ui);
+                        Todo todo = Parser.parseTodo(argsString);
+                        addTask(history, todo, storage, ui);
                         break;
                     case DEADLINE:
-                        if (inputParts.length < 2 || inputParts[1].trim().isEmpty()) {
-                            throw new PennyException("Whoops! A deadline needs a description. Try: deadline return book /by 2019-10-15");
-                        }
-                        String deadlineArg = inputParts[1].trim();
-                        if (!deadlineArg.contains("/by")) {
-                            throw new PennyException("Wait, a deadline needs a time limit. Try: deadline return book /by 2019-10-15");
-                        }
-                        String[] deadlineParts = deadlineArg.split("/by", 2);
-                        String deadlineDesc = deadlineParts[0].trim();
-                        String deadlineBy = deadlineParts[1].trim();
-
-                        if (deadlineDesc.isEmpty() && deadlineBy.isEmpty()) {
-                            throw new PennyException("Wait, a deadline needs both a description and a time limit. Try: deadline return book /by 2019-10-15");
-                        } else if (deadlineDesc.isEmpty()) {
-                            throw new PennyException("Whoops! A deadline needs a description before /by. Try: deadline return book /by 2019-10-15");
-                        } else if (deadlineBy.isEmpty()) {
-                            throw new PennyException("Wait, a deadline needs a time limit after /by. Try: deadline return book /by 2019-10-15");
-                        }
-                        if (deadlineDesc.contains("|") || deadlineBy.contains("|")) {
-                            throw new PennyException("Task description and deadline cannot contain the '|' character as it is reserved for data storage.");
-                        }
-                        addTask(history, new Deadline(deadlineDesc, deadlineBy), storage, ui);
+                        Deadline deadline = Parser.parseDeadline(argsString);
+                        addTask(history, deadline, storage, ui);
                         break;
                     case EVENT:
-                        if (inputParts.length < 2 || inputParts[1].trim().isEmpty()) {
-                            throw new PennyException("Whoops! An event needs a description. Try: event project meeting /from 2019-10-15 1400 /to 2019-10-15 1600");
-                        }
-                        String eventArg = inputParts[1].trim();
-                        if (!eventArg.contains("/from") || !eventArg.contains("/to")) {
-                            throw new PennyException("An event needs a start and end time. Try: event project meeting /from 2019-10-15 1400 /to 2019-10-15 1600");
-                        }
-                        String[] eventFromParts = eventArg.split("/from", 2);
-                        String eventDesc = eventFromParts[0].trim();
-                        if (!eventFromParts[1].contains("/to")) {
-                            throw new PennyException("An event needs a start and end time. Try: event project meeting /from 2019-10-15 1400 /to 2019-10-15 1600");
-                        }
-                        String[] eventToParts = eventFromParts[1].split("/to", 2);
-                        String eventFrom = eventToParts[0].trim();
-                        String eventTo = eventToParts[1].trim();
-
-                        if (eventDesc.isEmpty() && eventFrom.isEmpty() && eventTo.isEmpty()) {
-                            throw new PennyException("An event is missing details. Try: event project meeting /from 2019-10-15 1400 /to 2019-10-15 1600");
-                        } else if (eventDesc.isEmpty()) {
-                            throw new PennyException("Whoops! An event needs a description before /from. Try: event project meeting /from 2019-10-15 1400 /to 2019-10-15 1600");
-                        } else if (eventFrom.isEmpty()) {
-                            throw new PennyException("Wait, an event needs a start time after /from. Try: event project meeting /from 2019-10-15 1400 /to 2019-10-15 1600");
-                        } else if (eventTo.isEmpty()) {
-                            throw new PennyException("Wait, an event needs an end time after /to. Try: event project meeting /from 2019-10-15 1400 /to 2019-10-15 1600");
-                        }
-                        if (eventDesc.contains("|") || eventFrom.contains("|") || eventTo.contains("|")) {
-                            throw new PennyException("Task description and event times cannot contain the '|' character as it is reserved for data storage.");
-                        }
-                        addTask(history, new Event(eventDesc, eventFrom, eventTo), storage, ui);
+                        Event event = Parser.parseEvent(argsString);
+                        addTask(history, event, storage, ui);
                         break;
                     case ON:
-                        if (inputParts.length < 2 || inputParts[1].trim().isEmpty()) {
-                            throw new PennyException("Please specify a date to search for. Try: on 2019-10-15 or on 2/12/2019");
-                        }
-                        LocalDate targetDate = Time.parseDate(inputParts[1].trim());
+                        LocalDate targetDate = Parser.parseDateQuery(argsString);
                         String formattedTargetDate = targetDate.format(DISPLAY_DATE_FORMATTER);
 
                         List<Task> matchingTasks = new ArrayList<>();
