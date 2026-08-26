@@ -1,7 +1,6 @@
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Scanner;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,27 +14,26 @@ public class Penny {
 
     /**
      * Saves the current task list to disk via the storage component.
-     * Catches and reports any I/O or security permissions issues.
+     * Reports any I/O or security permissions issues via Ui.
      *
      * @param storage The Storage instance responsible for file persistence.
      * @param history The current list of tasks to save.
+     * @param ui The Ui instance used to display error messages.
      */
-    private static void saveTasks(Storage storage, List<Task> history) {
+    private static void saveTasks(Storage storage, List<Task> history, Ui ui) {
         try {
             storage.save(history);
         } catch (IOException e) {
-            System.out.println("     Warning: Failed to save tasks to file: " + e.getMessage());
+            ui.showError("Warning: Failed to save tasks to file: " + e.getMessage());
         } catch (SecurityException e) {
-            System.out.println("     Warning: Permission denied when saving tasks to file: " + e.getMessage());
+            ui.showError("Warning: Permission denied when saving tasks to file: " + e.getMessage());
         }
     }
 
-    private static void addTask(List<Task> history, Task t, Storage storage) {
+    private static void addTask(List<Task> history, Task t, Storage storage, Ui ui) {
         history.add(t);
-        System.out.println("     Got it. I've added this task:");
-        System.out.println("       " + t.toString());
-        System.out.println("     Now you have " + history.size() + " tasks in the list.");
-        saveTasks(storage, history);
+        ui.showTaskAdded(t, history.size());
+        saveTasks(storage, history, ui);
     }
 
     private static int parseTaskNumber(String command, String keyword, int listSize) throws PennyException {
@@ -60,35 +58,25 @@ public class Penny {
     }
 
     public static void main(String[] args) {
-        String divider = "____________________________________________________________";
-        String banner = " ___  ___  _  _  _  _  _  _ \n"
-                + "| . \\| __>| \\| || \\| || | |\n"
-                + "|  _/| _> | \\  || \\  |\\   /\n"
-                + "|_|  |___>|_|\\_||_|\\_| |_| \n";
-
-        System.out.println(divider);
-        System.out.println(banner);
-        System.out.println("     Hello! I'm Penny.");
-        System.out.println("     What can I do for you?");
-        System.out.println(divider);
+        Ui ui = new Ui();
+        ui.showWelcome();
 
         Storage storage = new Storage("data", "penny.txt");
         List<Task> history;
         try {
             history = storage.load();
         } catch (IOException e) {
-            System.out.println("     Warning: Could not read storage file (" + e.getMessage() + "). Starting with an empty list.");
+            ui.showLoadingError(e.getMessage());
             history = new ArrayList<>();
         } catch (SecurityException e) {
-            System.out.println("     Warning: Permission denied when accessing storage file. Starting with an empty list.");
+            ui.showError("Warning: Permission denied when accessing storage file. Starting with an empty list.");
             history = new ArrayList<>();
         }
 
-        Scanner scan = new Scanner(System.in);
-        String prevLine = scan.nextLine().trim();
+        String prevLine = ui.readCommand();
 
         while (!prevLine.equals("bye")) {
-            System.out.println(divider);
+            ui.showLine();
 
             try {
                 String[] inputParts = prevLine.split(" ", 2);
@@ -96,38 +84,27 @@ public class Penny {
 
                 switch (command) {
                     case LIST:
-                        if (history.isEmpty()) {
-                            System.out.println("     Your task list is empty.");
-                        } else {
-                            System.out.println("     Here are the tasks in your list:");
-                            for (int i = 0; i < history.size(); i++) {
-                                System.out.println("     " + (i + 1) + "." + history.get(i).toString());
-                            }
-                        }
+                        ui.showTaskList(history);
                         break;
                     case MARK:
                         int markIndex = parseTaskNumber(prevLine, "mark", history.size());
                         Task taskToMark = history.get(markIndex);
                         taskToMark.markAsDone();
-                        System.out.println("     Nice! I've marked this task as done:");
-                        System.out.println("       " + taskToMark.toString());
-                        saveTasks(storage, history);
+                        ui.showTaskMarked(taskToMark);
+                        saveTasks(storage, history, ui);
                         break;
                     case UNMARK:
                         int unmarkIndex = parseTaskNumber(prevLine, "unmark", history.size());
                         Task taskToUnmark = history.get(unmarkIndex);
                         taskToUnmark.markAsUndone();
-                        System.out.println("     OK, I've marked this task as not done yet:");
-                        System.out.println("       " + taskToUnmark.toString());
-                        saveTasks(storage, history);
+                        ui.showTaskUnmarked(taskToUnmark);
+                        saveTasks(storage, history, ui);
                         break;
                     case DELETE:
                         int deleteIndex = parseTaskNumber(prevLine, "delete", history.size());
                         Task removedTask = history.remove(deleteIndex);
-                        System.out.println("     Noted. I've removed this task:");
-                        System.out.println("       " + removedTask.toString());
-                        System.out.println("     Now you have " + history.size() + " tasks in the list.");
-                        saveTasks(storage, history);
+                        ui.showTaskDeleted(removedTask, history.size());
+                        saveTasks(storage, history, ui);
                         break;
                     case TODO:
                         if (inputParts.length < 2 || inputParts[1].trim().isEmpty()) {
@@ -137,7 +114,7 @@ public class Penny {
                         if (todoDesc.contains("|")) {
                             throw new PennyException("Task description cannot contain the '|' character as it is reserved for data storage.");
                         }
-                        addTask(history, new Todo(todoDesc), storage);
+                        addTask(history, new Todo(todoDesc), storage, ui);
                         break;
                     case DEADLINE:
                         if (inputParts.length < 2 || inputParts[1].trim().isEmpty()) {
@@ -161,7 +138,7 @@ public class Penny {
                         if (deadlineDesc.contains("|") || deadlineBy.contains("|")) {
                             throw new PennyException("Task description and deadline cannot contain the '|' character as it is reserved for data storage.");
                         }
-                        addTask(history, new Deadline(deadlineDesc, deadlineBy), storage);
+                        addTask(history, new Deadline(deadlineDesc, deadlineBy), storage, ui);
                         break;
                     case EVENT:
                         if (inputParts.length < 2 || inputParts[1].trim().isEmpty()) {
@@ -192,7 +169,7 @@ public class Penny {
                         if (eventDesc.contains("|") || eventFrom.contains("|") || eventTo.contains("|")) {
                             throw new PennyException("Task description and event times cannot contain the '|' character as it is reserved for data storage.");
                         }
-                        addTask(history, new Event(eventDesc, eventFrom, eventTo), storage);
+                        addTask(history, new Event(eventDesc, eventFrom, eventTo), storage, ui);
                         break;
                     case ON:
                         if (inputParts.length < 2 || inputParts[1].trim().isEmpty()) {
@@ -207,30 +184,20 @@ public class Penny {
                                 matchingTasks.add(task);
                             }
                         }
-
-                        if (matchingTasks.isEmpty()) {
-                            System.out.println("     No tasks found occurring on " + formattedTargetDate + ".");
-                        } else {
-                            System.out.println("     Here are the tasks occurring on " + formattedTargetDate + ":");
-                            for (int i = 0; i < matchingTasks.size(); i++) {
-                                System.out.println("     " + (i + 1) + "." + matchingTasks.get(i).toString());
-                            }
-                        }
+                        ui.showTasksOnDate(matchingTasks, formattedTargetDate);
                         break;
                     default:
                         throw new PennyException("Hmm, I don't quite understand that command. Valid commands: todo, deadline, event, list, mark, unmark, delete, on, bye.");
                 }
             } catch (PennyException e) {
-                System.out.println("     " + e.getMessage());
+                ui.showError(e.getMessage());
             }
 
-            System.out.println(divider);
-            prevLine = scan.nextLine().trim();
+            ui.showLine();
+            prevLine = ui.readCommand();
         }
 
-        System.out.println(divider);
-        System.out.println("     Bye. Hope to see you again soon!");
-        System.out.println(divider);
-        scan.close();
+        ui.showGoodbye();
+        ui.close();
     }
 }
