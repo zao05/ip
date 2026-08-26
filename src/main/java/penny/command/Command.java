@@ -1,3 +1,10 @@
+package penny.command;
+
+import penny.common.PennyException;
+import penny.storage.Storage;
+import penny.task.TaskList;
+import penny.ui.Ui;
+
 /**
  * Represents an executable command in the Penny application.
  * Defines the contract for executing user commands with access to TaskList, Ui, and Storage.

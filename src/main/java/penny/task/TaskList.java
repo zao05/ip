@@ -1,7 +1,10 @@
+package penny.task;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import penny.common.PennyException;
 
 /**
  * Represents and manages the collection of tasks in the Penny application.

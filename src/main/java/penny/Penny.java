@@ -1,3 +1,12 @@
+package penny;
+
+import penny.command.Command;
+import penny.common.PennyException;
+import penny.parser.Parser;
+import penny.storage.Storage;
+import penny.task.TaskList;
+import penny.ui.Ui;
+
 /**
  * Main class for the Penny chatbot application.
  * Manages chatbot lifecycle and coordinates Ui, Storage, TaskList, and Command execution.
@@ -16,6 +25,25 @@ public class Penny {
     public Penny(String filePath) {
         this.ui = new Ui();
         this.storage = new Storage(filePath);
+        TaskList loadedTasks;
+        try {
+            loadedTasks = new TaskList(storage.load());
+        } catch (PennyException e) {
+            ui.showLoadingError(e.getMessage());
+            loadedTasks = new TaskList();
+        }
+        this.tasks = loadedTasks;
+    }
+
+    /**
+     * Constructs a Penny chatbot instance with OS-independent path segments.
+     *
+     * @param first The primary directory or path segment.
+     * @param more Additional path segments if any.
+     */
+    public Penny(String first, String... more) {
+        this.ui = new Ui();
+        this.storage = new Storage(first, more);
         TaskList loadedTasks;
         try {
             loadedTasks = new TaskList(storage.load());
@@ -49,6 +77,6 @@ public class Penny {
     }
 
     public static void main(String[] args) {
-        new Penny("data/penny.txt").run();
+        new Penny("data", "penny.txt").run();
     }
 }
