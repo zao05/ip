@@ -1,3 +1,11 @@
+package penny.command;
+
+import penny.common.PennyException;
+import penny.storage.Storage;
+import penny.task.Task;
+import penny.task.TaskList;
+import penny.ui.Ui;
+
 /**
  * Represents a command to delete a task by its 0-based index.
  */

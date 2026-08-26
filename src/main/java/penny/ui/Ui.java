@@ -1,5 +1,8 @@
+package penny.ui;
+
 import java.util.List;
 import java.util.Scanner;
+import penny.task.Task;
 
 /**
  * Handles user interface interactions for the Penny chatbot.

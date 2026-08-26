@@ -1,3 +1,9 @@
+package penny.command;
+
+import penny.storage.Storage;
+import penny.task.TaskList;
+import penny.ui.Ui;
+
 /**
  * Represents a command to exit the Penny application.
  */
