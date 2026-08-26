@@ -22,6 +22,12 @@ import penny.task.Todo;
 public class Parser {
 
     /**
+     * Prevents instantiation of this utility class.
+     */
+    private Parser() {
+    }
+
+    /**
      * Parses the full user command string and returns the corresponding executable Command.
      *
      * @param fullCommand The raw line of text entered by the user.

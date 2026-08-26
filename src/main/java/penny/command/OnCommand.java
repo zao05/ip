@@ -25,6 +25,14 @@ public class OnCommand extends Command {
         this.targetDate = targetDate;
     }
 
+    /**
+     * Executes the date query command, filtering tasks occurring on the target date
+     * and displaying them via the user interface.
+     *
+     * @param tasks The task list searched for matching tasks.
+     * @param ui The user interface used to display matching results.
+     * @param storage The storage handler (not modified by this command).
+     */
     @Override
     public void execute(TaskList tasks, Ui ui, Storage storage) {
         List<Task> matchingTasks = tasks.findTasksOnDate(this.targetDate);

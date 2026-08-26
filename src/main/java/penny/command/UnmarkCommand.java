@@ -7,7 +7,7 @@ import penny.task.TaskList;
 import penny.ui.Ui;
 
 /**
- * Represents a command to mark a task as not yet completed.
+ * Represents a command to mark a completed task as not yet done.
  */
 public class UnmarkCommand extends Command {
 
@@ -22,6 +22,14 @@ public class UnmarkCommand extends Command {
         this.index = index;
     }
 
+    /**
+     * Executes the task unmarking, displays confirmation, and updates storage.
+     *
+     * @param tasks The task list containing the task to unmark.
+     * @param ui The user interface used to show confirmation.
+     * @param storage The storage handler used to persist the updated task list.
+     * @throws PennyException If the index is invalid or an error occurs during saving.
+     */
     @Override
     public void execute(TaskList tasks, Ui ui, Storage storage) throws PennyException {
         Task task = tasks.unmark(this.index);
