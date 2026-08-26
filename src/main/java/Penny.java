@@ -1,13 +1,17 @@
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Main class for the Penny chatbot application.
- * Manages user interactions, command parsing, task management, and file storage.
+ * Manages user interactions, command parsing, date/time task management, and file storage.
  */
 public class Penny {
+
+    private static final DateTimeFormatter DISPLAY_DATE_FORMATTER = DateTimeFormatter.ofPattern("MMM d yyyy");
 
     /**
      * Saves the current task list to disk via the storage component.
@@ -137,22 +141,22 @@ public class Penny {
                         break;
                     case DEADLINE:
                         if (inputParts.length < 2 || inputParts[1].trim().isEmpty()) {
-                            throw new PennyException("Whoops! A deadline needs a description. Try: deadline return book /by Sunday");
+                            throw new PennyException("Whoops! A deadline needs a description. Try: deadline return book /by 2019-10-15");
                         }
                         String deadlineArg = inputParts[1].trim();
                         if (!deadlineArg.contains("/by")) {
-                            throw new PennyException("Wait, a deadline needs a time limit. Try: deadline return book /by Sunday");
+                            throw new PennyException("Wait, a deadline needs a time limit. Try: deadline return book /by 2019-10-15");
                         }
                         String[] deadlineParts = deadlineArg.split("/by", 2);
                         String deadlineDesc = deadlineParts[0].trim();
                         String deadlineBy = deadlineParts[1].trim();
 
                         if (deadlineDesc.isEmpty() && deadlineBy.isEmpty()) {
-                            throw new PennyException("Wait, a deadline needs both a description and a time limit. Try: deadline return book /by Sunday");
+                            throw new PennyException("Wait, a deadline needs both a description and a time limit. Try: deadline return book /by 2019-10-15");
                         } else if (deadlineDesc.isEmpty()) {
-                            throw new PennyException("Whoops! A deadline needs a description before /by. Try: deadline return book /by Sunday");
+                            throw new PennyException("Whoops! A deadline needs a description before /by. Try: deadline return book /by 2019-10-15");
                         } else if (deadlineBy.isEmpty()) {
-                            throw new PennyException("Wait, a deadline needs a time limit after /by. Try: deadline return book /by Sunday");
+                            throw new PennyException("Wait, a deadline needs a time limit after /by. Try: deadline return book /by 2019-10-15");
                         }
                         if (deadlineDesc.contains("|") || deadlineBy.contains("|")) {
                             throw new PennyException("Task description and deadline cannot contain the '|' character as it is reserved for data storage.");
@@ -161,37 +165,60 @@ public class Penny {
                         break;
                     case EVENT:
                         if (inputParts.length < 2 || inputParts[1].trim().isEmpty()) {
-                            throw new PennyException("Whoops! An event needs a description. Try: event project meeting /from Mon 2pm /to 4pm");
+                            throw new PennyException("Whoops! An event needs a description. Try: event project meeting /from 2019-10-15 1400 /to 2019-10-15 1600");
                         }
                         String eventArg = inputParts[1].trim();
                         if (!eventArg.contains("/from") || !eventArg.contains("/to")) {
-                            throw new PennyException("An event needs a start and end time. Try: event project meeting /from Mon 2pm /to 4pm");
+                            throw new PennyException("An event needs a start and end time. Try: event project meeting /from 2019-10-15 1400 /to 2019-10-15 1600");
                         }
                         String[] eventFromParts = eventArg.split("/from", 2);
                         String eventDesc = eventFromParts[0].trim();
                         if (!eventFromParts[1].contains("/to")) {
-                            throw new PennyException("An event needs a start and end time. Try: event project meeting /from Mon 2pm /to 4pm");
+                            throw new PennyException("An event needs a start and end time. Try: event project meeting /from 2019-10-15 1400 /to 2019-10-15 1600");
                         }
                         String[] eventToParts = eventFromParts[1].split("/to", 2);
                         String eventFrom = eventToParts[0].trim();
                         String eventTo = eventToParts[1].trim();
 
                         if (eventDesc.isEmpty() && eventFrom.isEmpty() && eventTo.isEmpty()) {
-                            throw new PennyException("An event is missing details. Try: event project meeting /from Mon 2pm /to 4pm");
+                            throw new PennyException("An event is missing details. Try: event project meeting /from 2019-10-15 1400 /to 2019-10-15 1600");
                         } else if (eventDesc.isEmpty()) {
-                            throw new PennyException("Whoops! An event needs a description before /from. Try: event project meeting /from Mon 2pm /to 4pm");
+                            throw new PennyException("Whoops! An event needs a description before /from. Try: event project meeting /from 2019-10-15 1400 /to 2019-10-15 1600");
                         } else if (eventFrom.isEmpty()) {
-                            throw new PennyException("Wait, an event needs a start time after /from. Try: event project meeting /from Mon 2pm /to 4pm");
+                            throw new PennyException("Wait, an event needs a start time after /from. Try: event project meeting /from 2019-10-15 1400 /to 2019-10-15 1600");
                         } else if (eventTo.isEmpty()) {
-                            throw new PennyException("Wait, an event needs an end time after /to. Try: event project meeting /from Mon 2pm /to 4pm");
+                            throw new PennyException("Wait, an event needs an end time after /to. Try: event project meeting /from 2019-10-15 1400 /to 2019-10-15 1600");
                         }
                         if (eventDesc.contains("|") || eventFrom.contains("|") || eventTo.contains("|")) {
                             throw new PennyException("Task description and event times cannot contain the '|' character as it is reserved for data storage.");
                         }
                         addTask(history, new Event(eventDesc, eventFrom, eventTo), storage);
                         break;
+                    case ON:
+                        if (inputParts.length < 2 || inputParts[1].trim().isEmpty()) {
+                            throw new PennyException("Please specify a date to search for. Try: on 2019-10-15 or on 2/12/2019");
+                        }
+                        LocalDate targetDate = Time.parseDate(inputParts[1].trim());
+                        String formattedTargetDate = targetDate.format(DISPLAY_DATE_FORMATTER);
+
+                        List<Task> matchingTasks = new ArrayList<>();
+                        for (Task task : history) {
+                            if (task.isOnDate(targetDate)) {
+                                matchingTasks.add(task);
+                            }
+                        }
+
+                        if (matchingTasks.isEmpty()) {
+                            System.out.println("     No tasks found occurring on " + formattedTargetDate + ".");
+                        } else {
+                            System.out.println("     Here are the tasks occurring on " + formattedTargetDate + ":");
+                            for (int i = 0; i < matchingTasks.size(); i++) {
+                                System.out.println("     " + (i + 1) + "." + matchingTasks.get(i).toString());
+                            }
+                        }
+                        break;
                     default:
-                        throw new PennyException("Hmm, I don't quite understand that command. Valid commands: todo, deadline, event, list, mark, unmark, delete, bye.");
+                        throw new PennyException("Hmm, I don't quite understand that command. Valid commands: todo, deadline, event, list, mark, unmark, delete, on, bye.");
                 }
             } catch (PennyException e) {
                 System.out.println("     " + e.getMessage());
