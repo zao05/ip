@@ -9,6 +9,7 @@ import penny.common.Time;
  */
 public class Deadline extends Task {
 
+    /** The date and optional time by which the deadline must be completed. */
     protected Time by;
 
     /**
@@ -34,20 +35,41 @@ public class Deadline extends Task {
         this.by = by;
     }
 
+    /**
+     * Returns the deadline Time instance.
+     *
+     * @return The {@link Time} by which the task must be completed.
+     */
     public Time getBy() {
         return this.by;
     }
 
+    /**
+     * Checks if this deadline task is due on the specified date.
+     *
+     * @param targetDate The date to check against.
+     * @return True if the deadline date matches targetDate, false otherwise.
+     */
     @Override
     public boolean isOnDate(LocalDate targetDate) {
         return this.by.isOnDate(targetDate);
     }
 
+    /**
+     * Formats the deadline task into a pipe-delimited string for disk persistence.
+     *
+     * @return Formatted file storage string (e.g., "D | 0 | return book | 2019-10-15").
+     */
     @Override
     public String toFileFormat() {
         return "D | " + (isDone ? "1" : "0") + " | " + description + " | " + by.toFileFormat();
     }
 
+    /**
+     * Returns the string representation of the deadline task for display.
+     *
+     * @return Formatted deadline string (e.g., "[D][ ] return book (by: Oct 15 2019)").
+     */
     @Override
     public String toString() {
         return "[D]" + super.toString() + " (by: " + by.toString() + ")";

@@ -27,6 +27,8 @@ public class Time {
 
     private static final DateTimeFormatter DISPLAY_DATE_FORMATTER = DateTimeFormatter.ofPattern("MMM d yyyy");
     private static final DateTimeFormatter DISPLAY_TIME_FORMATTER = DateTimeFormatter.ofPattern("h:mma");
+    private static final DateTimeFormatter STORAGE_DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    private static final DateTimeFormatter STORAGE_TIME_FORMATTER = DateTimeFormatter.ofPattern("HHmm");
 
     private final LocalDate date;
     private final LocalTime time;
@@ -45,9 +47,9 @@ public class Time {
 
         for (DateTimeFormatter formatter : DATE_TIME_FORMATTERS) {
             try {
-                LocalDateTime ldt = LocalDateTime.parse(trimmed, formatter);
-                parsedDate = ldt.toLocalDate();
-                parsedTime = ldt.toLocalTime();
+                LocalDateTime dateTime = LocalDateTime.parse(trimmed, formatter);
+                parsedDate = dateTime.toLocalDate();
+                parsedTime = dateTime.toLocalTime();
                 isParsed = true;
                 break;
             } catch (DateTimeParseException ignored) {
@@ -104,30 +106,61 @@ public class Time {
                 + "'. Please use yyyy-MM-dd or d/M/yyyy (e.g. 2019-10-15 or 2/12/2019).");
     }
 
+    /**
+     * Returns the date component.
+     *
+     * @return The {@link LocalDate} instance.
+     */
     public LocalDate getDate() {
         return this.date;
     }
 
+    /**
+     * Checks if this instance contains a time component.
+     *
+     * @return True if a time is present, false otherwise.
+     */
     public boolean hasTime() {
         return this.time != null;
     }
 
+    /**
+     * Returns the time component if present.
+     *
+     * @return The {@link LocalTime} instance, or null if date-only.
+     */
     public LocalTime getTime() {
         return this.time;
     }
 
+    /**
+     * Checks if this date/time occurs on the specified date.
+     *
+     * @param targetDate The date to compare against.
+     * @return True if the date matches targetDate, false otherwise.
+     */
     public boolean isOnDate(LocalDate targetDate) {
         return this.date.equals(targetDate);
     }
 
+    /**
+     * Formats the date and optional time into storage file format.
+     *
+     * @return The formatted storage string (e.g., "2019-10-15" or "2019-10-15 1800").
+     */
     public String toFileFormat() {
         if (this.time != null) {
-            return this.date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) + " "
-                    + this.time.format(DateTimeFormatter.ofPattern("HHmm"));
+            return this.date.format(STORAGE_DATE_FORMATTER) + " "
+                    + this.time.format(STORAGE_TIME_FORMATTER);
         }
-        return this.date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        return this.date.format(STORAGE_DATE_FORMATTER);
     }
 
+    /**
+     * Formats the date and optional time for user-friendly display.
+     *
+     * @return Formatted string (e.g., "Oct 15 2019" or "Oct 15 2019, 6:00pm").
+     */
     @Override
     public String toString() {
         if (this.time != null) {

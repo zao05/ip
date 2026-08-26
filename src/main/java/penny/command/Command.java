@@ -12,6 +12,12 @@ import penny.ui.Ui;
 public abstract class Command {
 
     /**
+     * Constructs a base Command instance.
+     */
+    protected Command() {
+    }
+
+    /**
      * Executes the command.
      *
      * @param tasks The task list manipulated by the command.

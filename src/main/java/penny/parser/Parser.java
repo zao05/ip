@@ -22,6 +22,12 @@ import penny.task.Todo;
 public class Parser {
 
     /**
+     * Prevents instantiation of this utility class.
+     */
+    private Parser() {
+    }
+
+    /**
      * Parses the full user command string and returns the corresponding executable Command.
      *
      * @param fullCommand The raw line of text entered by the user.
@@ -54,7 +60,8 @@ public class Parser {
         case "on":
             return new OnCommand(parseDateQuery(args));
         default:
-            throw new PennyException("Hmm, I don't quite understand that command. Valid commands: todo, deadline, event, list, mark, unmark, delete, on, bye.");
+            throw new PennyException("Hmm, I don't quite understand that command. "
+                    + "Valid commands: todo, deadline, event, list, mark, unmark, delete, on, bye.");
         }
     }
 
@@ -74,11 +81,13 @@ public class Parser {
         try {
             int index = Integer.parseInt(argument) - 1;
             if (index < 0) {
-                throw new PennyException("Invalid task number: '" + argument + "'. Please enter a positive integer.");
+                throw new PennyException("Invalid task number: '" + argument
+                        + "'. Please enter a positive integer.");
             }
             return index;
         } catch (NumberFormatException e) {
-            throw new PennyException("Invalid task number: '" + argument + "'. Please enter a positive integer.");
+            throw new PennyException("Invalid task number: '" + argument
+                    + "'. Please enter a positive integer.");
         }
     }
 
@@ -94,7 +103,8 @@ public class Parser {
             throw new PennyException("Whoops! A todo needs a description. Try: todo read a book");
         }
         if (args.contains("|")) {
-            throw new PennyException("Task description cannot contain the '|' character as it is reserved for data storage.");
+            throw new PennyException("Task description cannot contain the '|' character "
+                    + "as it is reserved for data storage.");
         }
         return new Todo(args);
     }
@@ -108,26 +118,32 @@ public class Parser {
      */
     public static Deadline parseDeadline(String args) throws PennyException {
         if (args.isEmpty()) {
-            throw new PennyException("Whoops! A deadline needs a description. Try: deadline return book /by 2019-10-15");
+            throw new PennyException("Whoops! A deadline needs a description. "
+                    + "Try: deadline return book /by 2019-10-15");
         }
         if (!args.contains("/by")) {
-            throw new PennyException("Wait, a deadline needs a time limit. Try: deadline return book /by 2019-10-15");
+            throw new PennyException("Wait, a deadline needs a time limit. "
+                    + "Try: deadline return book /by 2019-10-15");
         }
         String[] parts = args.split("/by", 2);
-        String desc = parts[0].trim();
-        String by = parts[1].trim();
+        String description = parts[0].trim();
+        String deadlineTime = parts[1].trim();
 
-        if (desc.isEmpty() && by.isEmpty()) {
-            throw new PennyException("Wait, a deadline needs both a description and a time limit. Try: deadline return book /by 2019-10-15");
-        } else if (desc.isEmpty()) {
-            throw new PennyException("Whoops! A deadline needs a description before /by. Try: deadline return book /by 2019-10-15");
-        } else if (by.isEmpty()) {
-            throw new PennyException("Wait, a deadline needs a time limit after /by. Try: deadline return book /by 2019-10-15");
+        if (description.isEmpty() && deadlineTime.isEmpty()) {
+            throw new PennyException("Wait, a deadline needs both a description and a time limit. "
+                    + "Try: deadline return book /by 2019-10-15");
+        } else if (description.isEmpty()) {
+            throw new PennyException("Whoops! A deadline needs a description before /by. "
+                    + "Try: deadline return book /by 2019-10-15");
+        } else if (deadlineTime.isEmpty()) {
+            throw new PennyException("Wait, a deadline needs a time limit after /by. "
+                    + "Try: deadline return book /by 2019-10-15");
         }
-        if (desc.contains("|") || by.contains("|")) {
-            throw new PennyException("Task description and deadline cannot contain the '|' character as it is reserved for data storage.");
+        if (description.contains("|") || deadlineTime.contains("|")) {
+            throw new PennyException("Task description and deadline cannot contain the '|' character "
+                    + "as it is reserved for data storage.");
         }
-        return new Deadline(desc, by);
+        return new Deadline(description, deadlineTime);
     }
 
     /**
@@ -139,33 +155,41 @@ public class Parser {
      */
     public static Event parseEvent(String args) throws PennyException {
         if (args.isEmpty()) {
-            throw new PennyException("Whoops! An event needs a description. Try: event project meeting /from 2019-10-15 1400 /to 2019-10-15 1600");
+            throw new PennyException("Whoops! An event needs a description. "
+                    + "Try: event project meeting /from 2019-10-15 1400 /to 2019-10-15 1600");
         }
         if (!args.contains("/from") || !args.contains("/to")) {
-            throw new PennyException("An event needs a start and end time. Try: event project meeting /from 2019-10-15 1400 /to 2019-10-15 1600");
+            throw new PennyException("An event needs a start and end time. "
+                    + "Try: event project meeting /from 2019-10-15 1400 /to 2019-10-15 1600");
         }
         String[] fromParts = args.split("/from", 2);
-        String desc = fromParts[0].trim();
+        String description = fromParts[0].trim();
         if (!fromParts[1].contains("/to")) {
-            throw new PennyException("An event needs a start and end time. Try: event project meeting /from 2019-10-15 1400 /to 2019-10-15 1600");
+            throw new PennyException("An event needs a start and end time. "
+                    + "Try: event project meeting /from 2019-10-15 1400 /to 2019-10-15 1600");
         }
         String[] toParts = fromParts[1].split("/to", 2);
-        String from = toParts[0].trim();
-        String to = toParts[1].trim();
+        String startTime = toParts[0].trim();
+        String endTime = toParts[1].trim();
 
-        if (desc.isEmpty() && from.isEmpty() && to.isEmpty()) {
-            throw new PennyException("An event is missing details. Try: event project meeting /from 2019-10-15 1400 /to 2019-10-15 1600");
-        } else if (desc.isEmpty()) {
-            throw new PennyException("Whoops! An event needs a description before /from. Try: event project meeting /from 2019-10-15 1400 /to 2019-10-15 1600");
-        } else if (from.isEmpty()) {
-            throw new PennyException("Wait, an event needs a start time after /from. Try: event project meeting /from 2019-10-15 1400 /to 2019-10-15 1600");
-        } else if (to.isEmpty()) {
-            throw new PennyException("Wait, an event needs an end time after /to. Try: event project meeting /from 2019-10-15 1400 /to 2019-10-15 1600");
+        if (description.isEmpty() && startTime.isEmpty() && endTime.isEmpty()) {
+            throw new PennyException("An event is missing details. "
+                    + "Try: event project meeting /from 2019-10-15 1400 /to 2019-10-15 1600");
+        } else if (description.isEmpty()) {
+            throw new PennyException("Whoops! An event needs a description before /from. "
+                    + "Try: event project meeting /from 2019-10-15 1400 /to 2019-10-15 1600");
+        } else if (startTime.isEmpty()) {
+            throw new PennyException("Wait, an event needs a start time after /from. "
+                    + "Try: event project meeting /from 2019-10-15 1400 /to 2019-10-15 1600");
+        } else if (endTime.isEmpty()) {
+            throw new PennyException("Wait, an event needs an end time after /to. "
+                    + "Try: event project meeting /from 2019-10-15 1400 /to 2019-10-15 1600");
         }
-        if (desc.contains("|") || from.contains("|") || to.contains("|")) {
-            throw new PennyException("Task description and event times cannot contain the '|' character as it is reserved for data storage.");
+        if (description.contains("|") || startTime.contains("|") || endTime.contains("|")) {
+            throw new PennyException("Task description and event times cannot contain the '|' character "
+                    + "as it is reserved for data storage.");
         }
-        return new Event(desc, from, to);
+        return new Event(description, startTime, endTime);
     }
 
     /**

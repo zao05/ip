@@ -6,7 +6,11 @@ import java.time.LocalDate;
  * Abstract base class representing a generic task in Penny.
  */
 public abstract class Task {
+
+    /** The description of the task. */
     protected String description;
+
+    /** Indicates whether the task has been completed. */
     protected boolean isDone;
 
     /**
@@ -78,6 +82,11 @@ public abstract class Task {
      */
     public abstract String toFileFormat();
 
+    /**
+     * Returns the string representation of the task for display.
+     *
+     * @return The formatted status icon and description.
+     */
     @Override
     public String toString() {
         return "[" + getStatusIcon() + "] " + description;

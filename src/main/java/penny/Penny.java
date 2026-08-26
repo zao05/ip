@@ -8,8 +8,8 @@ import penny.task.TaskList;
 import penny.ui.Ui;
 
 /**
- * Main class for the Penny chatbot application.
- * Manages chatbot lifecycle and coordinates Ui, Storage, TaskList, and Command execution.
+ * Coordinates user interaction, command interpretation, task management,
+ * and data persistence across the application lifecycle.
  */
 public class Penny {
 
@@ -56,6 +56,7 @@ public class Penny {
 
     /**
      * Executes the main command processing loop of the chatbot using the Command pattern.
+     * Reads user commands continuously until an exit command is encountered.
      */
     public void run() {
         ui.showWelcome();
@@ -64,9 +65,9 @@ public class Penny {
             try {
                 String fullCommand = ui.readCommand();
                 ui.showLine();
-                Command c = Parser.parse(fullCommand);
-                c.execute(tasks, ui, storage);
-                isExit = c.isExit();
+                Command command = Parser.parse(fullCommand);
+                command.execute(tasks, ui, storage);
+                isExit = command.isExit();
             } catch (PennyException e) {
                 ui.showError(e.getMessage());
             } finally {
@@ -76,6 +77,11 @@ public class Penny {
         ui.close();
     }
 
+    /**
+     * Starts the Penny application from the command line.
+     *
+     * @param args Command-line arguments (not used).
+     */
     public static void main(String[] args) {
         new Penny("data", "penny.txt").run();
     }
