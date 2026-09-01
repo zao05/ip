@@ -6,6 +6,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+
 import penny.common.PennyException;
 import penny.task.Deadline;
 import penny.task.Event;
@@ -139,23 +140,23 @@ public class Storage {
         Task task;
 
         switch (type) {
-        case "T":
-            task = new Todo(description);
-            break;
-        case "D":
-            if (parts.length < 4 || parts[3].trim().isEmpty()) {
-                throw new PennyException("Corrupted deadline task (missing deadline time): " + line);
-            }
-            task = new Deadline(description, parts[3].trim());
-            break;
-        case "E":
-            if (parts.length < 5 || parts[3].trim().isEmpty() || parts[4].trim().isEmpty()) {
-                throw new PennyException("Corrupted event task (missing start or end time): " + line);
-            }
-            task = new Event(description, parts[3].trim(), parts[4].trim());
-            break;
-        default:
-            throw new PennyException("Unknown task type '" + type + "' in storage file: " + line);
+            case "T":
+                task = new Todo(description);
+                break;
+            case "D":
+                if (parts.length < 4 || parts[3].trim().isEmpty()) {
+                    throw new PennyException("Corrupted deadline task (missing deadline time): " + line);
+                }
+                task = new Deadline(description, parts[3].trim());
+                break;
+            case "E":
+                if (parts.length < 5 || parts[3].trim().isEmpty() || parts[4].trim().isEmpty()) {
+                    throw new PennyException("Corrupted event task (missing start or end time): " + line);
+                }
+                task = new Event(description, parts[3].trim(), parts[4].trim());
+                break;
+            default:
+                throw new PennyException("Unknown task type '" + type + "' in storage file: " + line);
         }
 
         if (isDone) {

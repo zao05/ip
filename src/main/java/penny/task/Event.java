@@ -1,6 +1,7 @@
 package penny.task;
 
 import java.time.LocalDate;
+
 import penny.common.PennyException;
 import penny.common.Time;
 
@@ -80,7 +81,8 @@ public class Event extends Task {
      */
     @Override
     public String toFileFormat() {
-        return "E | " + (isDone ? "1" : "0") + " | " + description + " | " + from.toFileFormat() + " | " + to.toFileFormat();
+        return "E | " + (isDone ? "1" : "0") + " | " + description + " | "
+                + from.toFileFormat() + " | " + to.toFileFormat();
     }
 
     /**
