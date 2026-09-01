@@ -1,6 +1,7 @@
 package penny.parser;
 
 import java.time.LocalDate;
+
 import penny.command.AddCommand;
 import penny.command.Command;
 import penny.command.DeleteCommand;
@@ -23,12 +24,6 @@ import penny.task.Todo;
 public class Parser {
 
     /**
-     * Prevents instantiation of this utility class.
-     */
-    private Parser() {
-    }
-
-    /**
      * Parses the full user command string and returns the corresponding executable Command.
      *
      * @param fullCommand The raw line of text entered by the user.
@@ -42,29 +37,29 @@ public class Parser {
         String args = parts.length > 1 ? parts[1].trim() : "";
 
         switch (commandWord) {
-        case "bye":
-            return new ExitCommand();
-        case "list":
-            return new ListCommand();
-        case "mark":
-            return new MarkCommand(parseTaskIndex(fullCommand, "mark"));
-        case "unmark":
-            return new UnmarkCommand(parseTaskIndex(fullCommand, "unmark"));
-        case "delete":
-            return new DeleteCommand(parseTaskIndex(fullCommand, "delete"));
-        case "todo":
-            return new AddCommand(parseTodo(args));
-        case "deadline":
-            return new AddCommand(parseDeadline(args));
-        case "event":
-            return new AddCommand(parseEvent(args));
-        case "on":
-            return new OnCommand(parseDateQuery(args));
-        case "find":
-            return new FindCommand(parseFindQuery(args));
-        default:
-            throw new PennyException("Hmm, I don't quite understand that command. "
-                    + "Valid commands: todo, deadline, event, list, mark, unmark, delete, on, bye.");
+            case "bye":
+                return new ExitCommand();
+            case "list":
+                return new ListCommand();
+            case "mark":
+                return new MarkCommand(parseTaskIndex(fullCommand, "mark"));
+            case "unmark":
+                return new UnmarkCommand(parseTaskIndex(fullCommand, "unmark"));
+            case "delete":
+                return new DeleteCommand(parseTaskIndex(fullCommand, "delete"));
+            case "todo":
+                return new AddCommand(parseTodo(args));
+            case "deadline":
+                return new AddCommand(parseDeadline(args));
+            case "event":
+                return new AddCommand(parseEvent(args));
+            case "on":
+                return new OnCommand(parseDateQuery(args));
+            case "find":
+                return new FindCommand(parseFindQuery(args));
+            default:
+                throw new PennyException("Hmm, I don't quite understand that command. "
+                        + "Valid commands: todo, deadline, event, list, mark, unmark, delete, on, find, bye.");
         }
     }
 
@@ -221,7 +216,8 @@ public class Parser {
             throw new PennyException("Please specify a keyword to search for. Try: find book");
         }
         if (args.contains("|")) {
-            throw new PennyException("Search keyword cannot contain the '|' character as it is reserved for data storage.");
+            throw new PennyException("Search keyword cannot contain the '|' character "
+                    + "as it is reserved for data storage.");
         }
         return args;
     }
