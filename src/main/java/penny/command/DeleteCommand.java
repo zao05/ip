@@ -28,12 +28,13 @@ public class DeleteCommand extends Command {
      * @param tasks The task list from which the task is removed.
      * @param ui The user interface used to display feedback.
      * @param storage The storage handler used to persist the updated task list.
+     * @return The confirmation message from the user interface.
      * @throws PennyException If the index is invalid or an error occurs during saving.
      */
     @Override
-    public void execute(TaskList tasks, Ui ui, Storage storage) throws PennyException {
+    public String execute(TaskList tasks, Ui ui, Storage storage) throws PennyException {
         Task removedTask = tasks.delete(this.index);
-        ui.showTaskDeleted(removedTask, tasks.size());
         storage.save(tasks);
+        return ui.showTaskDeleted(removedTask, tasks.size());
     }
 }

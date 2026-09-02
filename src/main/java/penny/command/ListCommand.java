@@ -22,9 +22,10 @@ public class ListCommand extends Command {
      * @param tasks The task list whose contents will be displayed.
      * @param ui The user interface used to render the task list.
      * @param storage The storage handler (not modified by this command).
+     * @return The task list string from the user interface.
      */
     @Override
-    public void execute(TaskList tasks, Ui ui, Storage storage) {
-        ui.showTaskList(tasks.getAllTasks());
+    public String execute(TaskList tasks, Ui ui, Storage storage) {
+        return ui.showTaskList(tasks.getAllTasks());
     }
 }

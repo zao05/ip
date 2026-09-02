@@ -22,10 +22,11 @@ public class ExitCommand extends Command {
      * @param tasks The task list (not modified by this command).
      * @param ui The user interface used to show the exit greeting.
      * @param storage The storage handler (not modified by this command).
+     * @return The goodbye message string from the user interface.
      */
     @Override
-    public void execute(TaskList tasks, Ui ui, Storage storage) {
-        ui.showGoodbye();
+    public String execute(TaskList tasks, Ui ui, Storage storage) {
+        return ui.showGoodbye();
     }
 
     /**

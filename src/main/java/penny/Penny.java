@@ -16,6 +16,7 @@ public class Penny {
     private final Storage storage;
     private final TaskList tasks;
     private final Ui ui;
+    private boolean isExit;
 
     /**
      * Constructs a Penny chatbot instance with a specified storage file path.
@@ -75,6 +76,41 @@ public class Penny {
             }
         }
         ui.close();
+    }
+
+    /**
+     * Generates a response for user input in the graphical user interface.
+     *
+     * @param input The raw command string entered by the user.
+     * @return The response string produced by executing the command, or the error message.
+     */
+    public String getResponse(String input) {
+        try {
+            Command command = Parser.parse(input);
+            String response = command.execute(tasks, ui, storage);
+            this.isExit = command.isExit();
+            return response;
+        } catch (PennyException e) {
+            return ui.showError(e.getMessage());
+        }
+    }
+
+    /**
+     * Indicates whether the last executed command signals the application to exit.
+     *
+     * @return True if the application should terminate, false otherwise.
+     */
+    public boolean isExit() {
+        return isExit;
+    }
+
+    /**
+     * Returns the welcome greeting string for the application.
+     *
+     * @return The welcome greeting message.
+     */
+    public String getWelcomeMessage() {
+        return "Hello! I'm Penny.\nWhat can I do for you?";
     }
 
     /**

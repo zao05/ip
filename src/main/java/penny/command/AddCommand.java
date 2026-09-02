@@ -28,12 +28,13 @@ public class AddCommand extends Command {
      * @param tasks The task list to which the task is added.
      * @param ui The user interface used to show confirmation.
      * @param storage The storage handler used to persist the updated task list.
+     * @return The confirmation message from the user interface.
      * @throws PennyException If an error occurs while saving to storage.
      */
     @Override
-    public void execute(TaskList tasks, Ui ui, Storage storage) throws PennyException {
+    public String execute(TaskList tasks, Ui ui, Storage storage) throws PennyException {
         tasks.add(this.task);
-        ui.showTaskAdded(this.task, tasks.size());
         storage.save(tasks);
+        return ui.showTaskAdded(this.task, tasks.size());
     }
 }

@@ -46,133 +46,181 @@ public class Ui {
     }
 
     /**
-     * Displays the welcome banner and greeting message.
+     * Displays the welcome banner and returns the greeting message.
+     *
+     * @return The welcome greeting string.
      */
-    public void showWelcome() {
+    public String showWelcome() {
         showLine();
         System.out.println(BANNER);
         System.out.println("     Hello! I'm Penny.");
         System.out.println("     What can I do for you?");
         showLine();
+        return "Hello! I'm Penny.\nWhat can I do for you?";
     }
 
     /**
-     * Displays the goodbye exit message.
+     * Displays and returns the goodbye exit message.
+     *
+     * @return The exit greeting string.
      */
-    public void showGoodbye() {
-        System.out.println("     Bye. Hope to see you again soon!");
+    public String showGoodbye() {
+        String message = "Bye. Hope to see you again soon!";
+        System.out.println("     " + message);
+        return message;
     }
 
     /**
-     * Displays an error or warning message with standard indentation.
+     * Displays and returns an error message with standard indentation.
      *
      * @param message The message to display.
+     * @return The error message string.
      */
-    public void showError(String message) {
+    public String showError(String message) {
         System.out.println("     " + message);
+        return message;
     }
 
     /**
-     * Displays a warning message when initial storage loading fails.
+     * Displays and returns a warning message when initial storage loading fails.
      *
      * @param message The underlying error message.
+     * @return The loading error warning string.
      */
-    public void showLoadingError(String message) {
-        System.out.println("     Warning: Could not read storage file (" + message + "). Starting with an empty list.");
+    public String showLoadingError(String message) {
+        String warning = "Warning: Could not read storage file (" + message + "). Starting with an empty list.";
+        System.out.println("     " + warning);
+        return warning;
     }
 
     /**
-     * Displays feedback when a task is successfully added.
+     * Displays and returns feedback when a task is successfully added.
      *
      * @param task The task that was added.
      * @param totalTasks The new total count of tasks.
+     * @return The task added confirmation string.
      */
-    public void showTaskAdded(Task task, int totalTasks) {
-        System.out.println("     Got it. I've added this task:");
-        System.out.println("       " + task.toString());
-        System.out.println("     Now you have " + totalTasks + " tasks in the list.");
+    public String showTaskAdded(Task task, int totalTasks) {
+        String response = "Got it. I've added this task:\n"
+                + "  " + task.toString() + "\n"
+                + "Now you have " + totalTasks + " tasks in the list.";
+        System.out.println("     " + response.replace("\n", "\n     "));
+        return response;
     }
 
     /**
-     * Displays feedback when a task is marked as done.
+     * Displays and returns feedback when a task is marked as done.
      *
      * @param task The task that was marked done.
+     * @return The marked task confirmation string.
      */
-    public void showTaskMarked(Task task) {
-        System.out.println("     Nice! I've marked this task as done:");
-        System.out.println("       " + task.toString());
+    public String showTaskMarked(Task task) {
+        String response = "Nice! I've marked this task as done:\n"
+                + "  " + task.toString();
+        System.out.println("     " + response.replace("\n", "\n     "));
+        return response;
     }
 
     /**
-     * Displays feedback when a task is marked as not yet completed.
+     * Displays and returns feedback when a task is marked as not yet completed.
      *
      * @param task The task that was unmarked.
+     * @return The unmarked task confirmation string.
      */
-    public void showTaskUnmarked(Task task) {
-        System.out.println("     OK, I've marked this task as not done yet:");
-        System.out.println("       " + task.toString());
+    public String showTaskUnmarked(Task task) {
+        String response = "OK, I've marked this task as not done yet:\n"
+                + "  " + task.toString();
+        System.out.println("     " + response.replace("\n", "\n     "));
+        return response;
     }
 
     /**
-     * Displays feedback when a task is deleted.
+     * Displays and returns feedback when a task is deleted.
      *
      * @param task The task that was removed.
      * @param remainingTasks The remaining count of tasks.
+     * @return The task deleted confirmation string.
      */
-    public void showTaskDeleted(Task task, int remainingTasks) {
-        System.out.println("     Noted. I've removed this task:");
-        System.out.println("       " + task.toString());
-        System.out.println("     Now you have " + remainingTasks + " tasks in the list.");
+    public String showTaskDeleted(Task task, int remainingTasks) {
+        String response = "Noted. I've removed this task:\n"
+                + "  " + task.toString() + "\n"
+                + "Now you have " + remainingTasks + " tasks in the list.";
+        System.out.println("     " + response.replace("\n", "\n     "));
+        return response;
     }
 
     /**
-     * Displays all tasks currently in the list.
+     * Displays and returns all tasks currently in the list.
      *
      * @param tasks The list of tasks to display.
+     * @return The task list string.
      */
-    public void showTaskList(List<Task> tasks) {
+    public String showTaskList(List<Task> tasks) {
         if (tasks.isEmpty()) {
-            System.out.println("     Your task list is empty.");
-        } else {
-            System.out.println("     Here are the tasks in your list:");
-            for (int i = 0; i < tasks.size(); i++) {
-                System.out.println("     " + (i + 1) + "." + tasks.get(i).toString());
+            String response = "Your task list is empty.";
+            System.out.println("     " + response);
+            return response;
+        }
+        StringBuilder sb = new StringBuilder("Here are the tasks in your list:\n");
+        for (int i = 0; i < tasks.size(); i++) {
+            sb.append(i + 1).append(".").append(tasks.get(i).toString());
+            if (i < tasks.size() - 1) {
+                sb.append("\n");
             }
         }
+        String response = sb.toString();
+        System.out.println("     " + response.replace("\n", "\n     "));
+        return response;
     }
 
     /**
-     * Displays tasks matching a specific date query.
+     * Displays and returns tasks matching a specific date query.
      *
      * @param matchingTasks The tasks occurring on that date.
      * @param formattedDate The formatted date string.
+     * @return The matching tasks string.
      */
-    public void showTasksOnDate(List<Task> matchingTasks, String formattedDate) {
+    public String showTasksOnDate(List<Task> matchingTasks, String formattedDate) {
         if (matchingTasks.isEmpty()) {
-            System.out.println("     No tasks found occurring on " + formattedDate + ".");
-        } else {
-            System.out.println("     Here are the tasks occurring on " + formattedDate + ":");
-            for (int i = 0; i < matchingTasks.size(); i++) {
-                System.out.println("     " + (i + 1) + "." + matchingTasks.get(i).toString());
+            String response = "No tasks found occurring on " + formattedDate + ".";
+            System.out.println("     " + response);
+            return response;
+        }
+        StringBuilder sb = new StringBuilder("Here are the tasks occurring on " + formattedDate + ":\n");
+        for (int i = 0; i < matchingTasks.size(); i++) {
+            sb.append(i + 1).append(".").append(matchingTasks.get(i).toString());
+            if (i < matchingTasks.size() - 1) {
+                sb.append("\n");
             }
         }
+        String response = sb.toString();
+        System.out.println("     " + response.replace("\n", "\n     "));
+        return response;
     }
 
     /**
-     * Displays tasks matching a keyword search query.
+     * Displays and returns tasks matching a keyword search query.
      *
      * @param matchingTasks The tasks whose description matches the keyword.
      * @param keyword The search keyword.
+     * @return The matching tasks string.
      */
-    public void showMatchingTasks(List<Task> matchingTasks, String keyword) {
+    public String showMatchingTasks(List<Task> matchingTasks, String keyword) {
         if (matchingTasks.isEmpty()) {
-            System.out.println("     No matching tasks found for keyword: '" + keyword + "'.");
-        } else {
-            System.out.println("     Here are the matching tasks in your list:");
-            for (int i = 0; i < matchingTasks.size(); i++) {
-                System.out.println("     " + (i + 1) + "." + matchingTasks.get(i).toString());
+            String response = "No matching tasks found for keyword: '" + keyword + "'.";
+            System.out.println("     " + response);
+            return response;
+        }
+        StringBuilder sb = new StringBuilder("Here are the matching tasks in your list:\n");
+        for (int i = 0; i < matchingTasks.size(); i++) {
+            sb.append(i + 1).append(".").append(matchingTasks.get(i).toString());
+            if (i < matchingTasks.size() - 1) {
+                sb.append("\n");
             }
         }
+        String response = sb.toString();
+        System.out.println("     " + response.replace("\n", "\n     "));
+        return response;
     }
 
     /**
