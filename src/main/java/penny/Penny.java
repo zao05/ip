@@ -24,16 +24,7 @@ public class Penny {
      * @param filePath The file path string to the storage file (e.g., "data/penny.txt").
      */
     public Penny(String filePath) {
-        this.ui = new Ui();
-        this.storage = new Storage(filePath);
-        TaskList loadedTasks;
-        try {
-            loadedTasks = new TaskList(storage.load());
-        } catch (PennyException e) {
-            ui.showLoadingError(e.getMessage());
-            loadedTasks = new TaskList();
-        }
-        this.tasks = loadedTasks;
+        this(filePath, new String[0]);
     }
 
     /**
