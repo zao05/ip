@@ -30,10 +30,11 @@ public class FindCommand extends Command {
      * @param tasks The task list searched for matching tasks.
      * @param ui The user interface used to display matching results.
      * @param storage The storage handler (not modified by this command).
+     * @return The matching tasks string from the user interface.
      */
     @Override
-    public void execute(TaskList tasks, Ui ui, Storage storage) {
+    public String execute(TaskList tasks, Ui ui, Storage storage) {
         List<Task> matchingTasks = tasks.findTasksByKeyword(this.keyword);
-        ui.showMatchingTasks(matchingTasks, this.keyword);
+        return ui.showMatchingTasks(matchingTasks, this.keyword);
     }
 }

@@ -28,12 +28,13 @@ public class MarkCommand extends Command {
      * @param tasks The task list containing the task to mark.
      * @param ui The user interface used to show confirmation.
      * @param storage The storage handler used to persist the updated task list.
+     * @return The confirmation message from the user interface.
      * @throws PennyException If the index is invalid or an error occurs during saving.
      */
     @Override
-    public void execute(TaskList tasks, Ui ui, Storage storage) throws PennyException {
+    public String execute(TaskList tasks, Ui ui, Storage storage) throws PennyException {
         Task task = tasks.mark(this.index);
-        ui.showTaskMarked(task);
         storage.save(tasks);
+        return ui.showTaskMarked(task);
     }
 }

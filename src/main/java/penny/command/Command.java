@@ -23,9 +23,10 @@ public abstract class Command {
      * @param tasks The task list manipulated by the command.
      * @param ui The user interface for displaying feedback.
      * @param storage The storage handler for saving tasks.
+     * @return The response string produced by the command execution.
      * @throws PennyException If execution fails due to invalid parameters or state.
      */
-    public abstract void execute(TaskList tasks, Ui ui, Storage storage) throws PennyException;
+    public abstract String execute(TaskList tasks, Ui ui, Storage storage) throws PennyException;
 
     /**
      * Indicates whether this command signals the chatbot to exit.
