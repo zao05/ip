@@ -1,0 +1,79 @@
+/* Background for the entire window */
+.root {
+    -fx-font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+}
+
+/* ScrollPane and Dialog Container */
+.scroll-pane {
+    -fx-background: #f4f6f8;
+    -fx-background-color: #f4f6f8;
+}
+
+.scroll-pane > .viewport {
+    -fx-background-color: transparent;
+}
+
+#dialogContainer {
+    -fx-background-color: transparent;
+    -fx-padding: 10px;
+    -fx-spacing: 12px;
+}
+
+/* Dialog Box Layout */
+.dialog-box {
+    -fx-spacing: 12px;
+    -fx-padding: 4px 6px;
+}
+
+/* Base Speech Bubble */
+.label {
+    -fx-font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    -fx-font-size: 14px;
+    -fx-background-radius: 14px;
+    -fx-padding: 10px 14px;
+}
+
+/* User Message Bubble */
+.user-label {
+    -fx-background-color: #dbeafe;
+    -fx-text-fill: #1e3a8a;
+}
+
+/* Penny Message Bubble */
+.penny-label {
+    -fx-background-color: #ffffff;
+    -fx-text-fill: #1f2937;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.06), 6, 0, 0, 2);
+}
+
+/* User Input Field */
+#userInput {
+    -fx-font-size: 14px;
+    -fx-background-radius: 8px;
+    -fx-border-radius: 8px;
+    -fx-border-color: #cbd5e1;
+    -fx-border-width: 1px;
+    -fx-padding: 8px 12px;
+}
+
+#userInput:focused {
+    -fx-border-color: #3b82f6;
+}
+
+/* Send Button */
+#sendButton {
+    -fx-font-size: 14px;
+    -fx-background-radius: 8px;
+    -fx-background-color: #2563eb;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+}
+
+#sendButton:hover {
+    -fx-background-color: #1d4ed8;
+}
+
+#sendButton:pressed {
+    -fx-background-color: #1e40af;
+}

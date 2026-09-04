@@ -13,6 +13,7 @@ import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
+import javafx.scene.shape.Circle;
 
 /**
  * Represents a dialog box consisting of an ImageView to represent the speaker's face
@@ -43,6 +44,7 @@ public class DialogBox extends HBox {
 
         dialog.setText(text);
         displayPicture.setImage(img);
+        displayPicture.setClip(new Circle(30.0, 30.0, 30.0));
     }
 
     /**
@@ -63,7 +65,9 @@ public class DialogBox extends HBox {
      * @return A dialog box representing the user.
      */
     public static DialogBox getUserDialog(String text, Image img) {
-        return new DialogBox(text, img);
+        DialogBox db = new DialogBox(text, img);
+        db.dialog.getStyleClass().add("user-label");
+        return db;
     }
 
     /**
@@ -75,6 +79,7 @@ public class DialogBox extends HBox {
      */
     public static DialogBox getPennyDialog(String text, Image img) {
         DialogBox db = new DialogBox(text, img);
+        db.dialog.getStyleClass().add("penny-label");
         db.flip();
         return db;
     }

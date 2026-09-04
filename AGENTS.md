@@ -18,7 +18,7 @@ Unless the user says otherwise, assume that you are assisting a student working 
 * Keep explanations brief but instructive, supporting learning through responsible use of AI. For example:
 
   * When suggesting a Git command, briefly explain what it does.
-  * Add explanatory Javadoc comments to all classes and to nontrivial methods and fields when their purpose or behavior is not obvious.
+  * Add explanatory comments to classes, methods, and fields when their purpose or behavior is not obvious.
   * Make generated code as self-explanatory as possible, and include explanatory comments where they improve understanding.
   * When faced with a design choice, choose the simplest option that is sufficient for the requirements, while briefly explaining relevant more advanced alternatives.
 
@@ -34,7 +34,7 @@ All Java code in this project MUST strictly follow the **SE-EDU Java Coding Stan
 * Explicit imports only (no wildcard imports like `import java.util.*;`).
 * Array specifiers attached to type (`int[] a`, not `int a[]`).
 * Booleans named with prefixes (`is`, `has`, `was`, `can`, `should`).
-* Javadoc headers for all classes, public/protected methods and non-trivial private methods, starting with 3rd-person singular verbs and ending parameter descriptions with periods.
+* Javadoc headers for all classes, public/protected methods, and constructors, starting with 3rd-person singular verbs and ending parameter descriptions with periods (not required for private methods).
 
 ## Git Conventions:
 

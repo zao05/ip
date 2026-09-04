@@ -85,7 +85,7 @@ This skill provides the mandatory Java coding rules and conventions defined by t
 * All comments and Javadocs must be written in **English** using American spelling.
 
 ### Javadoc Structure & Formatting
-* Mandatory for all classes, public/protected methods, constructors, and non-trivial private methods.
+* Mandatory for all classes, public/protected methods, and constructors (not required for private methods).
 * First sentence must be a concise summary starting with a verb in **third-person singular present tense** (e.g., `Returns the...`, `Adds a...`, `Parses the...`, `Constructs a...`).
 * Leave an empty line between description and `@param` / `@return` / `@throws` tags.
 * Parameter and return descriptions must end with punctuation (period).

@@ -9,6 +9,7 @@
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity"
             minHeight="-Infinity" minWidth="-Infinity"
             prefHeight="600.0" prefWidth="400.0"
+            stylesheets="@main.css"
             xmlns="http://javafx.com/javafx/17"
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="penny.ui.MainWindow">
@@ -28,6 +29,7 @@
                 prefWidth="76.0"
                 text="Send" />
         <ScrollPane fx:id="scrollPane"
+                    fitToWidth="true"
                     hbarPolicy="NEVER"
                     hvalue="1.0"
                     prefHeight="557.0"
