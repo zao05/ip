@@ -19,6 +19,7 @@ public class AddCommand extends Command {
      * @param task The task to be added.
      */
     public AddCommand(Task task) {
+        assert task != null : "Task to add cannot be null";
         this.task = task;
     }
 
@@ -33,6 +34,11 @@ public class AddCommand extends Command {
      */
     @Override
     public String execute(TaskList tasks, Ui ui, Storage storage) throws PennyException {
+        assert tasks != null : "TaskList must not be null";
+        assert ui != null : "Ui must not be null";
+        assert storage != null : "Storage must not be null";
+        assert this.task != null : "Task to add must not be null";
+
         tasks.add(this.task);
         storage.save(tasks);
         return ui.showTaskAdded(this.task, tasks.size());
