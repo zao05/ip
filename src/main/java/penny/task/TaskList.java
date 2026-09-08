@@ -143,13 +143,9 @@ public class TaskList {
      * @return List of tasks occurring on targetDate.
      */
     public List<Task> findTasksOnDate(LocalDate targetDate) {
-        List<Task> matchingTasks = new ArrayList<>();
-        for (Task task : this.tasks) {
-            if (task.isOnDate(targetDate)) {
-                matchingTasks.add(task);
-            }
-        }
-        return matchingTasks;
+        return this.tasks.stream()
+                .filter(task -> task.isOnDate(targetDate))
+                .toList();
     }
 
     /**
@@ -160,12 +156,8 @@ public class TaskList {
      */
     public List<Task> findTasksByKeyword(String keyword) {
         String lowerKeyword = keyword.toLowerCase();
-        List<Task> matchingTasks = new ArrayList<>();
-        for (Task task : this.tasks) {
-            if (task.getDescription().toLowerCase().contains(lowerKeyword)) {
-                matchingTasks.add(task);
-            }
-        }
-        return matchingTasks;
+        return this.tasks.stream()
+                .filter(task -> task.getDescription().toLowerCase().contains(lowerKeyword))
+                .toList();
     }
 }
