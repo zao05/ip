@@ -10,11 +10,14 @@ import penny.common.Time;
  */
 public class Event extends Task {
 
+    /** Single-character type code identifying an event task in storage. */
+    public static final String TYPE_CODE = "E";
+
     /** The start date and optional time of the event. */
-    protected Time from;
+    private final Time from;
 
     /** The end date and optional time of the event. */
-    protected Time to;
+    private final Time to;
 
     /**
      * Constructs an Event task with date/time strings for from and to boundaries.
@@ -81,8 +84,8 @@ public class Event extends Task {
      */
     @Override
     public String toFileFormat() {
-        return "E | " + (isDone ? "1" : "0") + " | " + description + " | "
-                + from.toFileFormat() + " | " + to.toFileFormat();
+        return toFileFormatPrefix(TYPE_CODE) + FIELD_DELIMITER + this.from.toFileFormat()
+                + FIELD_DELIMITER + this.to.toFileFormat();
     }
 
     /**
@@ -92,6 +95,6 @@ public class Event extends Task {
      */
     @Override
     public String toString() {
-        return "[E]" + super.toString() + " (from: " + from.toString() + " to: " + to.toString() + ")";
+        return "[E]" + super.toString() + " (from: " + this.from.toString() + " to: " + this.to.toString() + ")";
     }
 }

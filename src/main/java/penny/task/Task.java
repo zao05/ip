@@ -7,11 +7,20 @@ import java.time.LocalDate;
  */
 public abstract class Task {
 
+    /** Delimiter used between fields in data storage format. */
+    public static final String FIELD_DELIMITER = " | ";
+
+    /** Status indicator string for completed tasks in storage format. */
+    public static final String STATUS_DONE = "1";
+
+    /** Status indicator string for uncompleted tasks in storage format. */
+    public static final String STATUS_UNDONE = "0";
+
     /** The description of the task. */
-    protected String description;
+    private final String description;
 
     /** Indicates whether the task has been completed. */
-    protected boolean isDone;
+    private boolean isDone;
 
     /**
      * Constructs a Task with the specified description.
@@ -29,7 +38,7 @@ public abstract class Task {
      * @return "X" if completed, " " otherwise.
      */
     public String getStatusIcon() {
-        return (isDone ? "X" : " ");
+        return (this.isDone ? "X" : " ");
     }
 
     /**
@@ -76,6 +85,17 @@ public abstract class Task {
     }
 
     /**
+     * Formats the prefix common to all tasks for storage persistence.
+     *
+     * @param typeCode The single-character code identifying the task type.
+     * @return The formatted prefix string (e.g., "T | 1 | read book").
+     */
+    protected String toFileFormatPrefix(String typeCode) {
+        return typeCode + FIELD_DELIMITER + (this.isDone ? STATUS_DONE : STATUS_UNDONE)
+                + FIELD_DELIMITER + this.description;
+    }
+
+    /**
      * Formats the task into a pipe-delimited string for disk persistence.
      *
      * @return Storage file formatted string.
@@ -89,6 +109,6 @@ public abstract class Task {
      */
     @Override
     public String toString() {
-        return "[" + getStatusIcon() + "] " + description;
+        return "[" + getStatusIcon() + "] " + this.description;
     }
 }

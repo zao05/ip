@@ -5,6 +5,9 @@ package penny.task;
  */
 public class Todo extends Task {
 
+    /** Single-character type code identifying a todo task in storage. */
+    public static final String TYPE_CODE = "T";
+
     /**
      * Constructs a Todo task with the given description.
      *
@@ -21,7 +24,7 @@ public class Todo extends Task {
      */
     @Override
     public String toFileFormat() {
-        return "T | " + (isDone ? "1" : "0") + " | " + description;
+        return toFileFormatPrefix(TYPE_CODE);
     }
 
     /**

@@ -10,8 +10,11 @@ import penny.common.Time;
  */
 public class Deadline extends Task {
 
+    /** Single-character type code identifying a deadline task in storage. */
+    public static final String TYPE_CODE = "D";
+
     /** The date and optional time by which the deadline must be completed. */
-    protected Time by;
+    private final Time by;
 
     /**
      * Constructs a Deadline task with a description and a by-date string.
@@ -63,7 +66,7 @@ public class Deadline extends Task {
      */
     @Override
     public String toFileFormat() {
-        return "D | " + (isDone ? "1" : "0") + " | " + description + " | " + by.toFileFormat();
+        return toFileFormatPrefix(TYPE_CODE) + FIELD_DELIMITER + this.by.toFileFormat();
     }
 
     /**
@@ -73,6 +76,6 @@ public class Deadline extends Task {
      */
     @Override
     public String toString() {
-        return "[D]" + super.toString() + " (by: " + by.toString() + ")";
+        return "[D]" + super.toString() + " (by: " + this.by.toString() + ")";
     }
 }

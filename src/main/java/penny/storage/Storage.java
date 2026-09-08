@@ -19,6 +19,9 @@ import penny.task.Todo;
  * Encapsulates reading from and writing to disk, converting low-level I/O errors into domain exceptions.
  */
 public class Storage {
+
+    private static final String DELIMITER_REGEX = " \\| ";
+
     private final Path filePath;
 
     /**
@@ -119,49 +122,65 @@ public class Storage {
      * @throws PennyException If the line format is invalid, missing fields, or contains an unknown task type.
      */
     private Task parseTask(String line) throws PennyException {
-        String[] parts = line.split(" \\| ");
+        String[] parts = line.split(DELIMITER_REGEX);
         if (parts.length < 3) {
             throw new PennyException("Corrupted format in storage file (insufficient fields): " + line);
         }
 
         String type = parts[0].trim();
-        String statusStr = parts[1].trim();
-        String description = parts[2].trim();
+        boolean isDone = parseStatus(parts[1].trim(), line);
+        String description = parseDescription(parts[2].trim(), line);
 
-        if (!statusStr.equals("0") && !statusStr.equals("1")) {
-            throw new PennyException("Invalid status indicator '" + statusStr + "' in storage file: " + line);
-        }
-
-        if (description.isEmpty()) {
-            throw new PennyException("Missing task description in storage file: " + line);
-        }
-
-        boolean isDone = statusStr.equals("1");
-        Task task;
-
-        switch (type) {
-            case "T":
-                task = new Todo(description);
-                break;
-            case "D":
-                if (parts.length < 4 || parts[3].trim().isEmpty()) {
-                    throw new PennyException("Corrupted deadline task (missing deadline time): " + line);
-                }
-                task = new Deadline(description, parts[3].trim());
-                break;
-            case "E":
-                if (parts.length < 5 || parts[3].trim().isEmpty() || parts[4].trim().isEmpty()) {
-                    throw new PennyException("Corrupted event task (missing start or end time): " + line);
-                }
-                task = new Event(description, parts[3].trim(), parts[4].trim());
-                break;
-            default:
-                throw new PennyException("Unknown task type '" + type + "' in storage file: " + line);
-        }
-
+        Task task = createTask(type, description, parts, line);
         if (isDone) {
             task.markAsDone();
         }
         return task;
+    }
+
+    private boolean parseStatus(String statusStr, String line) throws PennyException {
+        if (statusStr.equals(Task.STATUS_DONE)) {
+            return true;
+        } else if (statusStr.equals(Task.STATUS_UNDONE)) {
+            return false;
+        }
+        throw new PennyException("Invalid status indicator '" + statusStr + "' in storage file: " + line);
+    }
+
+    private String parseDescription(String description, String line) throws PennyException {
+        if (description.isEmpty()) {
+            throw new PennyException("Missing task description in storage file: " + line);
+        }
+        return description;
+    }
+
+    private Task createTask(String type, String description, String[] parts, String line)
+            throws PennyException {
+        switch (type) {
+            case Todo.TYPE_CODE:
+                return new Todo(description);
+            case Deadline.TYPE_CODE:
+                return createDeadline(description, parts, line);
+            case Event.TYPE_CODE:
+                return createEvent(description, parts, line);
+            default:
+                throw new PennyException("Unknown task type '" + type + "' in storage file: " + line);
+        }
+    }
+
+    private Deadline createDeadline(String description, String[] parts, String line)
+            throws PennyException {
+        if (parts.length < 4 || parts[3].trim().isEmpty()) {
+            throw new PennyException("Corrupted deadline task (missing deadline time): " + line);
+        }
+        return new Deadline(description, parts[3].trim());
+    }
+
+    private Event createEvent(String description, String[] parts, String line)
+            throws PennyException {
+        if (parts.length < 5 || parts[3].trim().isEmpty() || parts[4].trim().isEmpty()) {
+            throw new PennyException("Corrupted event task (missing start or end time): " + line);
+        }
+        return new Event(description, parts[3].trim(), parts[4].trim());
     }
 }
