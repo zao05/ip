@@ -10,13 +10,6 @@ import penny.ui.Ui;
 public class ExitCommand extends Command {
 
     /**
-     * Constructs an ExitCommand.
-     */
-    public ExitCommand() {
-        super();
-    }
-
-    /**
      * Executes the exit command by displaying the goodbye message via the user interface.
      *
      * @param tasks The task list (not modified by this command).

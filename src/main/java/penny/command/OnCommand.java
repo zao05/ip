@@ -1,9 +1,9 @@
 package penny.command;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
+import penny.common.Time;
 import penny.storage.Storage;
 import penny.task.Task;
 import penny.task.TaskList;
@@ -14,7 +14,6 @@ import penny.ui.Ui;
  */
 public class OnCommand extends Command {
 
-    private static final DateTimeFormatter DISPLAY_DATE_FORMATTER = DateTimeFormatter.ofPattern("MMM d yyyy");
     private final LocalDate targetDate;
 
     /**
@@ -38,7 +37,7 @@ public class OnCommand extends Command {
     @Override
     public String execute(TaskList tasks, Ui ui, Storage storage) {
         List<Task> matchingTasks = tasks.findTasksOnDate(this.targetDate);
-        String formattedDate = this.targetDate.format(DISPLAY_DATE_FORMATTER);
+        String formattedDate = Time.formatDateForDisplay(this.targetDate);
         return ui.showTasksOnDate(matchingTasks, formattedDate);
     }
 }

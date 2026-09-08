@@ -9,9 +9,7 @@ import penny.ui.Ui;
 /**
  * Represents a command to mark a completed task as not yet done.
  */
-public class UnmarkCommand extends Command {
-
-    private final int index;
+public class UnmarkCommand extends TaskIndexCommand {
 
     /**
      * Constructs an UnmarkCommand with the target task index.
@@ -19,7 +17,7 @@ public class UnmarkCommand extends Command {
      * @param index The 0-based index of the task to unmark.
      */
     public UnmarkCommand(int index) {
-        this.index = index;
+        super(index);
     }
 
     /**
