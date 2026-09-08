@@ -19,6 +19,7 @@ public class DeleteCommand extends Command {
      * @param index The 0-based index of the task to delete.
      */
     public DeleteCommand(int index) {
+        assert index >= 0 : "Task index must be non-negative";
         this.index = index;
     }
 
@@ -33,6 +34,11 @@ public class DeleteCommand extends Command {
      */
     @Override
     public String execute(TaskList tasks, Ui ui, Storage storage) throws PennyException {
+        assert tasks != null : "TaskList must not be null";
+        assert ui != null : "Ui must not be null";
+        assert storage != null : "Storage must not be null";
+        assert this.index >= 0 : "Task index must be non-negative";
+
         Task removedTask = tasks.delete(this.index);
         storage.save(tasks);
         return ui.showTaskDeleted(removedTask, tasks.size());
