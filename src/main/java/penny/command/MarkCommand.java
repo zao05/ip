@@ -9,9 +9,7 @@ import penny.ui.Ui;
 /**
  * Represents a command to mark a task in the task list as completed.
  */
-public class MarkCommand extends Command {
-
-    private final int index;
+public class MarkCommand extends TaskIndexCommand {
 
     /**
      * Constructs a MarkCommand with the target task index.
@@ -19,8 +17,7 @@ public class MarkCommand extends Command {
      * @param index The 0-based index of the task to mark done.
      */
     public MarkCommand(int index) {
-        assert index >= 0 : "Task index must be non-negative";
-        this.index = index;
+        super(index);
     }
 
     /**

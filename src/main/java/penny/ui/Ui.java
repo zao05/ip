@@ -16,6 +16,7 @@ public class Ui {
             + "| . \\| __>| \\| || \\| || | |\n"
             + "|  _/| _> | \\  || \\  |\\   /\n"
             + "|_|  |___>|_|\\_||_|\\_| |_| \n";
+    private static final String INDENTATION = "     ";
 
     private final Scanner scanner;
 
@@ -46,6 +47,43 @@ public class Ui {
     }
 
     /**
+     * Prints a message to the console prefixed with standard indentation.
+     * Multi-line messages are formatted so each line aligns with the margin.
+     *
+     * @param message The message to print.
+     */
+    private void printIndented(String message) {
+        System.out.println(INDENTATION + message.replace("\n", "\n" + INDENTATION));
+    }
+
+    /**
+     * Formats a collection of tasks into a 1-based numbered list preceded by a header,
+     * or returns the fallback message if the collection is empty.
+     *
+     * @param header The header text preceding the numbered items.
+     * @param tasks The tasks to format into a list.
+     * @param emptyMessage The fallback message to display when no tasks exist.
+     * @return The formatted response string.
+     */
+    private String formatNumberedList(String header, List<Task> tasks, String emptyMessage) {
+        if (tasks.isEmpty()) {
+            printIndented(emptyMessage);
+            return emptyMessage;
+        }
+
+        StringBuilder sb = new StringBuilder(header).append(":\n");
+        for (int i = 0; i < tasks.size(); i++) {
+            sb.append(i + 1).append(".").append(tasks.get(i).toString());
+            if (i < tasks.size() - 1) {
+                sb.append("\n");
+            }
+        }
+        String response = sb.toString();
+        printIndented(response);
+        return response;
+    }
+
+    /**
      * Displays the welcome banner and returns the greeting message.
      *
      * @return The welcome greeting string.
@@ -53,8 +91,7 @@ public class Ui {
     public String showWelcome() {
         showLine();
         System.out.println(BANNER);
-        System.out.println("     Hello! I'm Penny.");
-        System.out.println("     What can I do for you?");
+        printIndented("Hello! I'm Penny.\nWhat can I do for you?");
         showLine();
         return "Hello! I'm Penny.\nWhat can I do for you?";
     }
@@ -66,7 +103,7 @@ public class Ui {
      */
     public String showGoodbye() {
         String message = "Bye. Hope to see you again soon!";
-        System.out.println("     " + message);
+        printIndented(message);
         return message;
     }
 
@@ -77,7 +114,7 @@ public class Ui {
      * @return The error message string.
      */
     public String showError(String message) {
-        System.out.println("     " + message);
+        printIndented(message);
         return message;
     }
 
@@ -89,7 +126,7 @@ public class Ui {
      */
     public String showLoadingError(String message) {
         String warning = "Warning: Could not read storage file (" + message + "). Starting with an empty list.";
-        System.out.println("     " + warning);
+        printIndented(warning);
         return warning;
     }
 
@@ -104,7 +141,7 @@ public class Ui {
         String response = "Got it. I've added this task:\n"
                 + "  " + task.toString() + "\n"
                 + "Now you have " + totalTasks + " tasks in the list.";
-        System.out.println("     " + response.replace("\n", "\n     "));
+        printIndented(response);
         return response;
     }
 
@@ -117,7 +154,7 @@ public class Ui {
     public String showTaskMarked(Task task) {
         String response = "Nice! I've marked this task as done:\n"
                 + "  " + task.toString();
-        System.out.println("     " + response.replace("\n", "\n     "));
+        printIndented(response);
         return response;
     }
 
@@ -130,7 +167,7 @@ public class Ui {
     public String showTaskUnmarked(Task task) {
         String response = "OK, I've marked this task as not done yet:\n"
                 + "  " + task.toString();
-        System.out.println("     " + response.replace("\n", "\n     "));
+        printIndented(response);
         return response;
     }
 
@@ -145,7 +182,7 @@ public class Ui {
         String response = "Noted. I've removed this task:\n"
                 + "  " + task.toString() + "\n"
                 + "Now you have " + remainingTasks + " tasks in the list.";
-        System.out.println("     " + response.replace("\n", "\n     "));
+        printIndented(response);
         return response;
     }
 
@@ -156,21 +193,7 @@ public class Ui {
      * @return The task list string.
      */
     public String showTaskList(List<Task> tasks) {
-        if (tasks.isEmpty()) {
-            String response = "Your task list is empty.";
-            System.out.println("     " + response);
-            return response;
-        }
-        StringBuilder sb = new StringBuilder("Here are the tasks in your list:\n");
-        for (int i = 0; i < tasks.size(); i++) {
-            sb.append(i + 1).append(".").append(tasks.get(i).toString());
-            if (i < tasks.size() - 1) {
-                sb.append("\n");
-            }
-        }
-        String response = sb.toString();
-        System.out.println("     " + response.replace("\n", "\n     "));
-        return response;
+        return formatNumberedList("Here are the tasks in your list", tasks, "Your task list is empty.");
     }
 
     /**
@@ -181,21 +204,8 @@ public class Ui {
      * @return The matching tasks string.
      */
     public String showTasksOnDate(List<Task> matchingTasks, String formattedDate) {
-        if (matchingTasks.isEmpty()) {
-            String response = "No tasks found occurring on " + formattedDate + ".";
-            System.out.println("     " + response);
-            return response;
-        }
-        StringBuilder sb = new StringBuilder("Here are the tasks occurring on " + formattedDate + ":\n");
-        for (int i = 0; i < matchingTasks.size(); i++) {
-            sb.append(i + 1).append(".").append(matchingTasks.get(i).toString());
-            if (i < matchingTasks.size() - 1) {
-                sb.append("\n");
-            }
-        }
-        String response = sb.toString();
-        System.out.println("     " + response.replace("\n", "\n     "));
-        return response;
+        return formatNumberedList("Here are the tasks occurring on " + formattedDate,
+                matchingTasks, "No tasks found occurring on " + formattedDate + ".");
     }
 
     /**
@@ -206,21 +216,8 @@ public class Ui {
      * @return The matching tasks string.
      */
     public String showMatchingTasks(List<Task> matchingTasks, String keyword) {
-        if (matchingTasks.isEmpty()) {
-            String response = "No matching tasks found for keyword: '" + keyword + "'.";
-            System.out.println("     " + response);
-            return response;
-        }
-        StringBuilder sb = new StringBuilder("Here are the matching tasks in your list:\n");
-        for (int i = 0; i < matchingTasks.size(); i++) {
-            sb.append(i + 1).append(".").append(matchingTasks.get(i).toString());
-            if (i < matchingTasks.size() - 1) {
-                sb.append("\n");
-            }
-        }
-        String response = sb.toString();
-        System.out.println("     " + response.replace("\n", "\n     "));
-        return response;
+        return formatNumberedList("Here are the matching tasks in your list",
+                matchingTasks, "No matching tasks found for keyword: '" + keyword + "'.");
     }
 
     /**

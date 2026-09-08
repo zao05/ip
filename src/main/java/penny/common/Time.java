@@ -107,6 +107,16 @@ public class Time {
     }
 
     /**
+     * Formats a date for user-friendly display (e.g., "Oct 15 2019").
+     *
+     * @param date The date to format.
+     * @return The formatted date string.
+     */
+    public static String formatDateForDisplay(LocalDate date) {
+        return date.format(DISPLAY_DATE_FORMATTER);
+    }
+
+    /**
      * Returns the date component.
      *
      * @return The {@link LocalDate} instance.

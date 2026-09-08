@@ -10,13 +10,6 @@ import penny.ui.Ui;
 public class ListCommand extends Command {
 
     /**
-     * Constructs a ListCommand.
-     */
-    public ListCommand() {
-        super();
-    }
-
-    /**
      * Executes the list command by requesting the user interface to display all tasks.
      *
      * @param tasks The task list whose contents will be displayed.

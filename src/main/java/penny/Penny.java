@@ -55,14 +55,14 @@ public class Penny {
      */
     public void run() {
         ui.showWelcome();
-        boolean isExit = false;
-        while (!isExit) {
+        this.isExit = false;
+        while (!this.isExit) {
             try {
                 String fullCommand = ui.readCommand();
                 ui.showLine();
                 Command command = Parser.parse(fullCommand);
                 command.execute(tasks, ui, storage);
-                isExit = command.isExit();
+                this.isExit = command.isExit();
             } catch (PennyException e) {
                 ui.showError(e.getMessage());
             } finally {

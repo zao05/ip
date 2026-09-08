@@ -121,10 +121,7 @@ public class Parser {
         if (args.isEmpty()) {
             throw new PennyException("Whoops! A todo needs a description. Try: todo read a book");
         }
-        if (args.contains("|")) {
-            throw new PennyException("Task description cannot contain the '|' character "
-                    + "as it is reserved for data storage.");
-        }
+        validateNoReservedDelimiter("Task description", args);
         Todo todo = new Todo(args);
         assert !todo.getDescription().isEmpty() : "Todo description must not be empty";
         return todo;
@@ -151,6 +148,16 @@ public class Parser {
         String description = parts[0].trim();
         String deadlineTime = parts[1].trim();
 
+        validateDeadlineArguments(description, deadlineTime);
+        validateNoReservedDelimiter("Task description and deadline", description, deadlineTime);
+        Deadline deadline = new Deadline(description, deadlineTime);
+        assert !deadline.getDescription().isEmpty() : "Deadline description must not be empty";
+        assert deadline.getBy() != null : "Deadline by time must not be null";
+        return deadline;
+    }
+
+    private static void validateDeadlineArguments(String description, String deadlineTime)
+            throws PennyException {
         if (description.isEmpty() && deadlineTime.isEmpty()) {
             throw new PennyException("Wait, a deadline needs both a description and a time limit. "
                     + "Try: deadline return book /by 2019-10-15");
@@ -161,14 +168,6 @@ public class Parser {
             throw new PennyException("Wait, a deadline needs a time limit after /by. "
                     + "Try: deadline return book /by 2019-10-15");
         }
-        if (description.contains("|") || deadlineTime.contains("|")) {
-            throw new PennyException("Task description and deadline cannot contain the '|' character "
-                    + "as it is reserved for data storage.");
-        }
-        Deadline deadline = new Deadline(description, deadlineTime);
-        assert !deadline.getDescription().isEmpty() : "Deadline description must not be empty";
-        assert deadline.getBy() != null : "Deadline by time must not be null";
-        return deadline;
     }
 
     /**
@@ -184,20 +183,36 @@ public class Parser {
             throw new PennyException("Whoops! An event needs a description. "
                     + "Try: event project meeting /from 2019-10-15 1400 /to 2019-10-15 1600");
         }
+        String[] parts = extractEventParts(args);
+        String description = parts[0];
+        String startTime = parts[1];
+        String endTime = parts[2];
+
+        validateEventArguments(description, startTime, endTime);
+        validateNoReservedDelimiter("Task description and event times", description, startTime, endTime);
+        Event event = new Event(description, startTime, endTime);
+        assert !event.getDescription().isEmpty() : "Event description must not be empty";
+        assert event.getFrom() != null && event.getTo() != null
+                : "Event start and end times must not be null";
+        return event;
+    }
+
+    private static String[] extractEventParts(String args) throws PennyException {
         if (!args.contains("/from") || !args.contains("/to")) {
             throw new PennyException("An event needs a start and end time. "
                     + "Try: event project meeting /from 2019-10-15 1400 /to 2019-10-15 1600");
         }
         String[] fromParts = args.split("/from", 2);
-        String description = fromParts[0].trim();
         if (!fromParts[1].contains("/to")) {
             throw new PennyException("An event needs a start and end time. "
                     + "Try: event project meeting /from 2019-10-15 1400 /to 2019-10-15 1600");
         }
         String[] toParts = fromParts[1].split("/to", 2);
-        String startTime = toParts[0].trim();
-        String endTime = toParts[1].trim();
+        return new String[] { fromParts[0].trim(), toParts[0].trim(), toParts[1].trim() };
+    }
 
+    private static void validateEventArguments(String description, String startTime, String endTime)
+            throws PennyException {
         if (description.isEmpty() && startTime.isEmpty() && endTime.isEmpty()) {
             throw new PennyException("An event is missing details. "
                     + "Try: event project meeting /from 2019-10-15 1400 /to 2019-10-15 1600");
@@ -211,15 +226,6 @@ public class Parser {
             throw new PennyException("Wait, an event needs an end time after /to. "
                     + "Try: event project meeting /from 2019-10-15 1400 /to 2019-10-15 1600");
         }
-        if (description.contains("|") || startTime.contains("|") || endTime.contains("|")) {
-            throw new PennyException("Task description and event times cannot contain the '|' character "
-                    + "as it is reserved for data storage.");
-        }
-        Event event = new Event(description, startTime, endTime);
-        assert !event.getDescription().isEmpty() : "Event description must not be empty";
-        assert event.getFrom() != null && event.getTo() != null
-                : "Event start and end times must not be null";
-        return event;
     }
 
     /**
@@ -251,11 +257,18 @@ public class Parser {
         if (args.isEmpty()) {
             throw new PennyException("Please specify a keyword to search for. Try: find book");
         }
-        if (args.contains("|")) {
-            throw new PennyException("Search keyword cannot contain the '|' character "
-                    + "as it is reserved for data storage.");
-        }
+        validateNoReservedDelimiter("Search keyword", args);
         assert !args.isEmpty() : "Search keyword must not be empty";
         return args;
+    }
+
+    private static void validateNoReservedDelimiter(String fieldName, String... values)
+            throws PennyException {
+        for (String value : values) {
+            if (value.contains("|")) {
+                throw new PennyException(fieldName + " cannot contain the '|' character "
+                        + "as it is reserved for data storage.");
+            }
+        }
     }
 }

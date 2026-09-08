@@ -9,9 +9,7 @@ import penny.ui.Ui;
 /**
  * Represents a command to delete a task from the task list by its 0-based index.
  */
-public class DeleteCommand extends Command {
-
-    private final int index;
+public class DeleteCommand extends TaskIndexCommand {
 
     /**
      * Constructs a DeleteCommand with the target task index.
@@ -19,8 +17,7 @@ public class DeleteCommand extends Command {
      * @param index The 0-based index of the task to delete.
      */
     public DeleteCommand(int index) {
-        assert index >= 0 : "Task index must be non-negative";
-        this.index = index;
+        super(index);
     }
 
     /**
