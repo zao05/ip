@@ -162,13 +162,9 @@ public class TaskList {
      */
     public List<Task> findTasksOnDate(LocalDate targetDate) {
         assert targetDate != null : "Search targetDate must not be null";
-        List<Task> matchingTasks = new ArrayList<>();
-        for (Task task : this.tasks) {
-            if (task.isOnDate(targetDate)) {
-                matchingTasks.add(task);
-            }
-        }
-        return matchingTasks;
+        return this.tasks.stream()
+                .filter(task -> task.isOnDate(targetDate))
+                .toList();
     }
 
     /**
@@ -180,12 +176,8 @@ public class TaskList {
     public List<Task> findTasksByKeyword(String keyword) {
         assert keyword != null : "Search keyword must not be null";
         String lowerKeyword = keyword.toLowerCase();
-        List<Task> matchingTasks = new ArrayList<>();
-        for (Task task : this.tasks) {
-            if (task.getDescription().toLowerCase().contains(lowerKeyword)) {
-                matchingTasks.add(task);
-            }
-        }
-        return matchingTasks;
+        return this.tasks.stream()
+                .filter(task -> task.getDescription().toLowerCase().contains(lowerKeyword))
+                .toList();
     }
 }

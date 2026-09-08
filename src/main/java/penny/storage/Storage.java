@@ -80,13 +80,14 @@ public class Storage {
                 Files.createDirectories(filePath.getParent());
             }
 
-            List<String> lines = new ArrayList<>();
-            for (Task task : tasks) {
-                assert task != null : "Tasks list should not contain null elements";
-                String formattedLine = task.toFileFormat();
-                assert !formattedLine.isEmpty() : "Task file format representation must not be empty";
-                lines.add(formattedLine);
-            }
+            List<String> lines = tasks.stream()
+                    .map(task -> {
+                        assert task != null : "Tasks list should not contain null elements";
+                        String formattedLine = task.toFileFormat();
+                        assert !formattedLine.isEmpty() : "Task file format representation must not be empty";
+                        return formattedLine;
+                    })
+                    .toList();
 
             Files.write(filePath, lines);
         } catch (IOException | SecurityException e) {
