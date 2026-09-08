@@ -20,6 +20,7 @@ public class FindCommand extends Command {
      * @param keyword The keyword used to filter tasks.
      */
     public FindCommand(String keyword) {
+        assert keyword != null && !keyword.isEmpty() : "Search keyword must not be empty";
         this.keyword = keyword;
     }
 
@@ -34,6 +35,11 @@ public class FindCommand extends Command {
      */
     @Override
     public String execute(TaskList tasks, Ui ui, Storage storage) {
+        assert tasks != null : "TaskList must not be null";
+        assert ui != null : "Ui must not be null";
+        assert storage != null : "Storage must not be null";
+        assert this.keyword != null && !this.keyword.isEmpty() : "Search keyword must not be empty";
+
         List<Task> matchingTasks = tasks.findTasksByKeyword(this.keyword);
         return ui.showMatchingTasks(matchingTasks, this.keyword);
     }

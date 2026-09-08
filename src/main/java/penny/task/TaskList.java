@@ -29,6 +29,7 @@ public class TaskList {
      * @param tasks The initial list of tasks.
      */
     public TaskList(List<Task> tasks) {
+        assert tasks != null : "Initial task list must not be null";
         this.tasks = new ArrayList<>(tasks);
     }
 
@@ -38,7 +39,10 @@ public class TaskList {
      * @param task The task to be added.
      */
     public void add(Task task) {
+        assert task != null : "Cannot add a null task to TaskList";
+        int initialSize = this.tasks.size();
         this.tasks.add(task);
+        assert this.tasks.size() == initialSize + 1 : "Task list size must increase by 1 after adding task";
     }
 
     /**
@@ -50,7 +54,12 @@ public class TaskList {
      */
     public Task delete(int index) throws PennyException {
         validateIndex(index);
-        return this.tasks.remove(index);
+        assert index >= 0 && index < this.tasks.size() : "Index must be within bounds after validation";
+        int initialSize = this.tasks.size();
+        Task removedTask = this.tasks.remove(index);
+        assert removedTask != null : "Removed task should not be null";
+        assert this.tasks.size() == initialSize - 1 : "Task list size must decrease by 1 after deleting task";
+        return removedTask;
     }
 
     /**
@@ -62,7 +71,10 @@ public class TaskList {
      */
     public Task get(int index) throws PennyException {
         validateIndex(index);
-        return this.tasks.get(index);
+        assert index >= 0 && index < this.tasks.size() : "Index must be within bounds after validation";
+        Task task = this.tasks.get(index);
+        assert task != null : "Retrieved task should not be null";
+        return task;
     }
 
     /**
@@ -74,8 +86,11 @@ public class TaskList {
      */
     public Task mark(int index) throws PennyException {
         validateIndex(index);
+        assert index >= 0 && index < this.tasks.size() : "Index must be within bounds after validation";
         Task task = this.tasks.get(index);
+        assert task != null : "Target task to mark should not be null";
         task.markAsDone();
+        assert task.isDone() : "Task must be marked done after mark()";
         return task;
     }
 
@@ -88,8 +103,11 @@ public class TaskList {
      */
     public Task unmark(int index) throws PennyException {
         validateIndex(index);
+        assert index >= 0 && index < this.tasks.size() : "Index must be within bounds after validation";
         Task task = this.tasks.get(index);
+        assert task != null : "Target task to unmark should not be null";
         task.markAsUndone();
+        assert !task.isDone() : "Task must be marked undone after unmark()";
         return task;
     }
 
@@ -143,6 +161,7 @@ public class TaskList {
      * @return List of tasks occurring on targetDate.
      */
     public List<Task> findTasksOnDate(LocalDate targetDate) {
+        assert targetDate != null : "Search targetDate must not be null";
         List<Task> matchingTasks = new ArrayList<>();
         for (Task task : this.tasks) {
             if (task.isOnDate(targetDate)) {
@@ -159,6 +178,7 @@ public class TaskList {
      * @return List of matching tasks.
      */
     public List<Task> findTasksByKeyword(String keyword) {
+        assert keyword != null : "Search keyword must not be null";
         String lowerKeyword = keyword.toLowerCase();
         List<Task> matchingTasks = new ArrayList<>();
         for (Task task : this.tasks) {

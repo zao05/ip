@@ -46,6 +46,7 @@ public class Storage {
      * @param filePath The {@link Path} where tasks will be stored.
      */
     public Storage(Path filePath) {
+        assert filePath != null : "Storage filePath must not be null";
         this.filePath = filePath;
     }
 
@@ -56,6 +57,7 @@ public class Storage {
      * @throws PennyException If an I/O or security error occurs when writing to the file.
      */
     public void save(TaskList taskList) throws PennyException {
+        assert taskList != null : "TaskList to save must not be null";
         save(taskList.getAllTasks());
     }
 
@@ -67,6 +69,9 @@ public class Storage {
      * @throws PennyException If an I/O or security error occurs when writing to the file.
      */
     public void save(List<Task> tasks) throws PennyException {
+        assert tasks != null : "Tasks list to save must not be null";
+        assert this.filePath != null : "Storage filePath must not be null";
+
         try {
             if (filePath.getParent() != null && !Files.exists(filePath.getParent())) {
                 Files.createDirectories(filePath.getParent());
@@ -74,7 +79,10 @@ public class Storage {
 
             List<String> lines = new ArrayList<>();
             for (Task task : tasks) {
-                lines.add(task.toFileFormat());
+                assert task != null : "Tasks list should not contain null elements";
+                String formattedLine = task.toFileFormat();
+                assert !formattedLine.isEmpty() : "Task file format representation must not be empty";
+                lines.add(formattedLine);
             }
 
             Files.write(filePath, lines);
@@ -91,6 +99,7 @@ public class Storage {
      * @throws PennyException If an I/O error occurs or the file contents are corrupted.
      */
     public List<Task> load() throws PennyException {
+        assert this.filePath != null : "Storage filePath must not be null";
         List<Task> tasks = new ArrayList<>();
         if (Files.notExists(filePath)) {
             return tasks;
@@ -119,6 +128,7 @@ public class Storage {
      * @throws PennyException If the line format is invalid, missing fields, or contains an unknown task type.
      */
     private Task parseTask(String line) throws PennyException {
+        assert line != null : "Line to parse must not be null";
         String[] parts = line.split(" \\| ");
         if (parts.length < 3) {
             throw new PennyException("Corrupted format in storage file (insufficient fields): " + line);
@@ -159,9 +169,11 @@ public class Storage {
                 throw new PennyException("Unknown task type '" + type + "' in storage file: " + line);
         }
 
+        assert task != null : "Task object should be instantiated if no exception was thrown";
         if (isDone) {
             task.markAsDone();
         }
+        assert task.isDone() == isDone : "Task completion state must match parsed isDone flag";
         return task;
     }
 }
