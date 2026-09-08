@@ -22,6 +22,7 @@ public class OnCommand extends Command {
      * @param targetDate The date to search for tasks.
      */
     public OnCommand(LocalDate targetDate) {
+        assert targetDate != null : "Target date must not be null";
         this.targetDate = targetDate;
     }
 
@@ -36,6 +37,11 @@ public class OnCommand extends Command {
      */
     @Override
     public String execute(TaskList tasks, Ui ui, Storage storage) {
+        assert tasks != null : "TaskList must not be null";
+        assert ui != null : "Ui must not be null";
+        assert storage != null : "Storage must not be null";
+        assert this.targetDate != null : "Target date must not be null";
+
         List<Task> matchingTasks = tasks.findTasksOnDate(this.targetDate);
         String formattedDate = Time.formatDateForDisplay(this.targetDate);
         return ui.showTasksOnDate(matchingTasks, formattedDate);

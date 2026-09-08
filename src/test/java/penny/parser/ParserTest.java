@@ -180,4 +180,11 @@ public class ParserTest {
         });
         assertTrue(exception.getMessage().contains("Hmm, I don't quite understand that command"));
     }
+
+    @Test
+    public void parse_nullCommand_assertionError() {
+        assertThrows(AssertionError.class, () -> {
+            Parser.parse(null);
+        });
+    }
 }

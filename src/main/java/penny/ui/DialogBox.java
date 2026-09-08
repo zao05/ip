@@ -33,6 +33,9 @@ public class DialogBox extends HBox {
      * @param img The image of the speaker.
      */
     private DialogBox(String text, Image img) {
+        assert text != null : "Dialog text should not be null";
+        assert img != null : "Speaker avatar image should not be null";
+
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(MainWindow.class.getResource("/view/DialogBox.fxml"));
             fxmlLoader.setController(this);
@@ -41,6 +44,9 @@ public class DialogBox extends HBox {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        assert dialog != null : "fx:id 'dialog' was not injected: check DialogBox.fxml";
+        assert displayPicture != null : "fx:id 'displayPicture' was not injected: check DialogBox.fxml";
 
         dialog.setText(text);
         displayPicture.setImage(img);

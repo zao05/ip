@@ -31,36 +31,51 @@ public class Parser {
      * @throws PennyException If the command word is unknown or the arguments are malformed.
      */
     public static Command parse(String fullCommand) throws PennyException {
+        assert fullCommand != null : "Command string cannot be null";
         String trimmed = fullCommand.trim();
         String[] parts = trimmed.split(" ", 2);
         String commandWord = parts[0].toLowerCase();
         String args = parts.length > 1 ? parts[1].trim() : "";
 
+        Command command;
         switch (commandWord) {
             case "bye":
-                return new ExitCommand();
+                command = new ExitCommand();
+                break;
             case "list":
-                return new ListCommand();
+                command = new ListCommand();
+                break;
             case "mark":
-                return new MarkCommand(parseTaskIndex(fullCommand, "mark"));
+                command = new MarkCommand(parseTaskIndex(fullCommand, "mark"));
+                break;
             case "unmark":
-                return new UnmarkCommand(parseTaskIndex(fullCommand, "unmark"));
+                command = new UnmarkCommand(parseTaskIndex(fullCommand, "unmark"));
+                break;
             case "delete":
-                return new DeleteCommand(parseTaskIndex(fullCommand, "delete"));
+                command = new DeleteCommand(parseTaskIndex(fullCommand, "delete"));
+                break;
             case "todo":
-                return new AddCommand(parseTodo(args));
+                command = new AddCommand(parseTodo(args));
+                break;
             case "deadline":
-                return new AddCommand(parseDeadline(args));
+                command = new AddCommand(parseDeadline(args));
+                break;
             case "event":
-                return new AddCommand(parseEvent(args));
+                command = new AddCommand(parseEvent(args));
+                break;
             case "on":
-                return new OnCommand(parseDateQuery(args));
+                command = new OnCommand(parseDateQuery(args));
+                break;
             case "find":
-                return new FindCommand(parseFindQuery(args));
+                command = new FindCommand(parseFindQuery(args));
+                break;
             default:
                 throw new PennyException("Hmm, I don't quite understand that command. "
                         + "Valid commands: todo, deadline, event, list, mark, unmark, delete, on, find, bye.");
         }
+
+        assert command != null : "Parsed command must not be null";
+        return command;
     }
 
     /**
@@ -72,6 +87,10 @@ public class Parser {
      * @throws PennyException If the task number is missing or non-numeric.
      */
     public static int parseTaskIndex(String fullCommand, String keyword) throws PennyException {
+        assert fullCommand != null : "fullCommand cannot be null";
+        assert keyword != null : "keyword cannot be null";
+        assert fullCommand.trim().toLowerCase().startsWith(keyword) : "fullCommand must start with keyword";
+
         String argument = fullCommand.substring(keyword.length()).trim();
         if (argument.isEmpty()) {
             throw new PennyException("Please specify a task number. Try: " + keyword + " 1");
@@ -82,6 +101,7 @@ public class Parser {
                 throw new PennyException("Invalid task number: '" + argument
                         + "'. Please enter a positive integer.");
             }
+            assert index >= 0 : "Parsed 0-based task index must be non-negative";
             return index;
         } catch (NumberFormatException e) {
             throw new PennyException("Invalid task number: '" + argument
@@ -97,11 +117,14 @@ public class Parser {
      * @throws PennyException If description is empty or contains reserved delimiter '|'.
      */
     public static Todo parseTodo(String args) throws PennyException {
+        assert args != null : "args cannot be null";
         if (args.isEmpty()) {
             throw new PennyException("Whoops! A todo needs a description. Try: todo read a book");
         }
         validateNoReservedDelimiter("Task description", args);
-        return new Todo(args);
+        Todo todo = new Todo(args);
+        assert !todo.getDescription().isEmpty() : "Todo description must not be empty";
+        return todo;
     }
 
     /**
@@ -112,6 +135,7 @@ public class Parser {
      * @throws PennyException If description or deadline time is missing or invalid.
      */
     public static Deadline parseDeadline(String args) throws PennyException {
+        assert args != null : "args cannot be null";
         if (args.isEmpty()) {
             throw new PennyException("Whoops! A deadline needs a description. "
                     + "Try: deadline return book /by 2019-10-15");
@@ -126,7 +150,10 @@ public class Parser {
 
         validateDeadlineArguments(description, deadlineTime);
         validateNoReservedDelimiter("Task description and deadline", description, deadlineTime);
-        return new Deadline(description, deadlineTime);
+        Deadline deadline = new Deadline(description, deadlineTime);
+        assert !deadline.getDescription().isEmpty() : "Deadline description must not be empty";
+        assert deadline.getBy() != null : "Deadline by time must not be null";
+        return deadline;
     }
 
     private static void validateDeadlineArguments(String description, String deadlineTime)
@@ -151,6 +178,7 @@ public class Parser {
      * @throws PennyException If description, start time, or end time is missing or invalid.
      */
     public static Event parseEvent(String args) throws PennyException {
+        assert args != null : "args cannot be null";
         if (args.isEmpty()) {
             throw new PennyException("Whoops! An event needs a description. "
                     + "Try: event project meeting /from 2019-10-15 1400 /to 2019-10-15 1600");
@@ -162,7 +190,11 @@ public class Parser {
 
         validateEventArguments(description, startTime, endTime);
         validateNoReservedDelimiter("Task description and event times", description, startTime, endTime);
-        return new Event(description, startTime, endTime);
+        Event event = new Event(description, startTime, endTime);
+        assert !event.getDescription().isEmpty() : "Event description must not be empty";
+        assert event.getFrom() != null && event.getTo() != null
+                : "Event start and end times must not be null";
+        return event;
     }
 
     private static String[] extractEventParts(String args) throws PennyException {
@@ -204,10 +236,13 @@ public class Parser {
      * @throws PennyException If date argument is empty or invalid.
      */
     public static LocalDate parseDateQuery(String args) throws PennyException {
+        assert args != null : "args cannot be null";
         if (args.isEmpty()) {
             throw new PennyException("Please specify a date to search for. Try: on 2019-10-15 or on 2/12/2019");
         }
-        return Time.parseDate(args);
+        LocalDate date = Time.parseDate(args);
+        assert date != null : "Parsed date must not be null";
+        return date;
     }
 
     /**
@@ -218,10 +253,12 @@ public class Parser {
      * @throws PennyException If the keyword is empty or contains reserved characters.
      */
     public static String parseFindQuery(String args) throws PennyException {
+        assert args != null : "args cannot be null";
         if (args.isEmpty()) {
             throw new PennyException("Please specify a keyword to search for. Try: find book");
         }
         validateNoReservedDelimiter("Search keyword", args);
+        assert !args.isEmpty() : "Search keyword must not be empty";
         return args;
     }
 

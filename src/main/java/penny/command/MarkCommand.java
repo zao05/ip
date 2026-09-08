@@ -31,6 +31,11 @@ public class MarkCommand extends TaskIndexCommand {
      */
     @Override
     public String execute(TaskList tasks, Ui ui, Storage storage) throws PennyException {
+        assert tasks != null : "TaskList must not be null";
+        assert ui != null : "Ui must not be null";
+        assert storage != null : "Storage must not be null";
+        assert this.index >= 0 : "Task index must be non-negative";
+
         Task task = tasks.mark(this.index);
         storage.save(tasks);
         return ui.showTaskMarked(task);

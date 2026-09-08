@@ -16,6 +16,7 @@ public abstract class TaskIndexCommand extends Command {
      * @param index The 0-based index of the target task.
      */
     protected TaskIndexCommand(int index) {
+        assert index >= 0 : "Task index must be non-negative";
         this.index = index;
     }
 }

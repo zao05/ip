@@ -117,4 +117,32 @@ public class TaskListTest {
         List<Task> matchingTasks = taskList.findTasksByKeyword("nonexistent");
         assertTrue(matchingTasks.isEmpty());
     }
+
+    @Test
+    public void add_nullTask_assertionError() {
+        assertThrows(AssertionError.class, () -> {
+            taskList.add(null);
+        });
+    }
+
+    @Test
+    public void taskList_nullInitialList_assertionError() {
+        assertThrows(AssertionError.class, () -> {
+            new TaskList(null);
+        });
+    }
+
+    @Test
+    public void findTasksOnDate_nullDate_assertionError() {
+        assertThrows(AssertionError.class, () -> {
+            taskList.findTasksOnDate(null);
+        });
+    }
+
+    @Test
+    public void findTasksByKeyword_nullKeyword_assertionError() {
+        assertThrows(AssertionError.class, () -> {
+            taskList.findTasksByKeyword(null);
+        });
+    }
 }

@@ -44,6 +44,9 @@ public class Penny {
             loadedTasks = new TaskList();
         }
         this.tasks = loadedTasks;
+        assert this.storage != null : "Storage component must be initialized";
+        assert this.tasks != null : "TaskList component must be initialized";
+        assert this.ui != null : "Ui component must be initialized";
     }
 
     /**
@@ -76,14 +79,22 @@ public class Penny {
      * @return The response string produced by executing the command, or the error message.
      */
     public String getResponse(String input) {
+        assert input != null : "Input text cannot be null";
+        assert this.tasks != null : "TaskList must be initialized";
+        assert this.ui != null : "Ui must be initialized";
+        assert this.storage != null : "Storage must be initialized";
+
+        String response;
         try {
             Command command = Parser.parse(input);
-            String response = command.execute(tasks, ui, storage);
+            response = command.execute(tasks, ui, storage);
             this.isExit = command.isExit();
-            return response;
         } catch (PennyException e) {
-            return ui.showError(e.getMessage());
+            response = ui.showError(e.getMessage());
         }
+
+        assert response != null : "Penny response must never be null";
+        return response;
     }
 
     /**
