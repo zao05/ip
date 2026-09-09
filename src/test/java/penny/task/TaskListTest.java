@@ -119,6 +119,36 @@ public class TaskListTest {
     }
 
     @Test
+    public void findTasksByKeyword_multipleKeywords_matchesConjunctive() {
+        List<Task> matchingTasks = taskList.findTasksByKeyword("read book");
+        assertEquals(1, matchingTasks.size());
+        assertEquals(sampleTodo, matchingTasks.get(0));
+
+        List<Task> reversedMatches = taskList.findTasksByKeyword("book read");
+        assertEquals(1, reversedMatches.size());
+        assertEquals(sampleTodo, reversedMatches.get(0));
+    }
+
+    @Test
+    public void findTasksByKeyword_partialKeyword_matches() {
+        List<Task> matchingTasks = taskList.findTasksByKeyword("sub assign");
+        assertEquals(1, matchingTasks.size());
+        assertEquals(sampleDeadline, matchingTasks.get(0));
+    }
+
+    @Test
+    public void findTasksByKeyword_partialMismatch_returnsEmptyList() {
+        List<Task> matchingTasks = taskList.findTasksByKeyword("read assignment");
+        assertTrue(matchingTasks.isEmpty());
+    }
+
+    @Test
+    public void findTasksByKeyword_whitespaceOnly_returnsEmptyList() {
+        List<Task> matchingTasks = taskList.findTasksByKeyword("   ");
+        assertTrue(matchingTasks.isEmpty());
+    }
+
+    @Test
     public void add_nullTask_assertionError() {
         assertThrows(AssertionError.class, () -> {
             taskList.add(null);
