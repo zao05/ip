@@ -2,6 +2,7 @@ package penny.task;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -168,16 +169,25 @@ public class TaskList {
     }
 
     /**
-     * Finds and returns all tasks whose description contains the specified keyword (case-insensitive).
+     * Finds and returns all tasks whose description matches all keywords in the search query.
+     * Supports case-insensitive, word-order independent, and partial-word matching.
      *
-     * @param keyword The keyword to search for.
-     * @return List of matching tasks.
+     * @param query The space-separated search query.
+     * @return List of matching tasks containing all query keywords.
      */
-    public List<Task> findTasksByKeyword(String keyword) {
-        assert keyword != null : "Search keyword must not be null";
-        String lowerKeyword = keyword.toLowerCase();
+    public List<Task> findTasksByKeyword(String query) {
+        assert query != null : "Search query must not be null";
+        String trimmed = query.trim();
+        if (trimmed.isEmpty()) {
+            return Collections.emptyList();
+        }
+        String[] keywords = trimmed.toLowerCase().split("\\s+");
         return this.tasks.stream()
-                .filter(task -> task.getDescription().toLowerCase().contains(lowerKeyword))
+                .filter(task -> {
+                    String description = task.getDescription().toLowerCase();
+                    return Arrays.stream(keywords)
+                            .allMatch(description::contains);
+                })
                 .toList();
     }
 }
