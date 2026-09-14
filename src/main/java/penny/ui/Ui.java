@@ -1,13 +1,14 @@
 package penny.ui;
 
 import java.util.List;
+import java.util.Random;
 import java.util.Scanner;
 
 import penny.task.Task;
 
 /**
- * Handles user interface interactions for the Penny chatbot.
- * Manages standard input from the user and formatted output to the console.
+ * Handles user interface interactions for the Penny chatbot with a Peni Parker &amp; SP//dr personality.
+ * Manages standard input from the user, randomized themed feedback, and formatted output.
  */
 public class Ui {
 
@@ -18,13 +19,135 @@ public class Ui {
             + "|_|  |___>|_|\\_||_|\\_| |_| \n";
     private static final String INDENTATION = "     ";
 
+    private static final String[] WELCOME_MESSAGES = {
+        "Kon'nichiwa! Peni Parker online with SP//dr! "
+                + "Neural link synchronized. What's the mission today?",
+        "SP//dr systems online and diagnostic complete! "
+                + "Ready to log some tasks, pilot?",
+        "Yo! Peni here! All dimensional channels clear. "
+                + "Let's get through today's objectives!"
+    };
+
+    private static final String[] GOODBYE_MESSAGES = {
+        "SP//dr powering down to standby mode... "
+                + "Disconnecting neural link. See you in the next dimension!",
+        "Mission debrief complete! Powering off core thrusters. "
+                + "Catch ya later, pilot!",
+        "Disengaging interface! Don't forget to take a break and grab some snacks! Ja ne!"
+    };
+
+    private static final String[] TASK_ADDED_TEMPLATES = {
+        "Mission directive logged into SP//dr!\n"
+                + "  %s\n"
+                + "Mission queue updated: %d active operation(s) ready for deployment!",
+        "Target locked and registered in the database!\n"
+                + "  %s\n"
+                + "Total directives in queue: %d.",
+        "Added to the tactical HUD!\n"
+                + "  %s\n"
+                + "SP//dr workload currently sitting at %d task(s)."
+    };
+
+    private static final String[] TASK_MARKED_TEMPLATES = {
+        "Target neutralized! Objective completed:\n"
+                + "  %s\n"
+                + "Great work, pilot! Keep that momentum going!",
+        "Direct hit! Objective cleared from the radar:\n"
+                + "  %s\n"
+                + "SP//dr combat efficiency +100!",
+        "Boom! Mission accomplished!\n"
+                + "  %s\n"
+                + "One step closer to saving the day!"
+    };
+
+    private static final String[] TASK_UNMARKED_TEMPLATES = {
+        "Wait, mission objective reactivated? Back to the queue:\n"
+                + "  %s\n"
+                + "No worries, we'll get 'em next time!",
+        "Re-flagging operation as ongoing!\n"
+                + "  %s\n"
+                + "SP//dr sensors back on target.",
+        "Status reset: objective still active!\n"
+                + "  %s\n"
+                + "Don't give up, pilot!"
+    };
+
+    private static final String[] TASK_DELETED_TEMPLATES = {
+        "Purged from databanks! Operation eliminated:\n"
+                + "  %s\n"
+                + "Remaining operations: %d.",
+        "Scrapped directive! Erased from SP//dr memory:\n"
+                + "  %s\n"
+                + "Active tasks left in tactical queue: %d.",
+        "Directive aborted and discarded!\n"
+                + "  %s\n"
+                + "Tactical workload decreased to %d task(s)."
+    };
+
+    private static final String[] TASK_LIST_HEADERS = {
+        "SP//dr Tactical HUD: Active Protocols",
+        "Mission Scanner Readout: Here's what's queued up",
+        "Tactical Briefing: Current task status"
+    };
+
+    private static final String[] TASK_LIST_EMPTY_MESSAGES = {
+        "Radar is clear! No active missions on the scanner right now. Time for some ramen?",
+        "Queue is totally empty! SP//dr is in resting idle mode.",
+        "All objectives clear! Zero tasks pending in the matrix!"
+    };
+
+    private static final String[] DATE_SEARCH_HEADERS = {
+        "Tactical schedule for %s",
+        "Mission radar sweep for %s",
+        "Protocols operating on %s"
+    };
+
+    private static final String[] DATE_SEARCH_EMPTY_MESSAGES = {
+        "No missions detected on radar for %s.",
+        "Tactical calendar clear: zero operations on %s.",
+        "Scanner returned no tasks scheduled for %s."
+    };
+
+    private static final String[] KEYWORD_SEARCH_HEADERS = {
+        "Matching tactical signatures for '%s'",
+        "Scanner query results for '%s'",
+        "Located protocols matching '%s'"
+    };
+
+    private static final String[] KEYWORD_SEARCH_EMPTY_MESSAGES = {
+        "Zero signals matching '%s' found in SP//dr databanks.",
+        "Radar search complete: no tasks match keyword '%s'.",
+        "Negative contact! No directives contain '%s'."
+    };
+
+    private static final String[] ERROR_TEMPLATES = {
+        "Bzzzt! System glitch! %s\n"
+                + "Check the console syntax and try again, pilot!",
+        "Error: Command not recognized by SP//dr!\n"
+                + "%s",
+        "Whoa, neural feedback error! %s\n"
+                + "Let's recalibrate and try that again!"
+    };
+
     private final Scanner scanner;
+    private final Random random;
 
     /**
-     * Constructs a Ui object initializing the input scanner.
+     * Constructs a Ui object initializing the input scanner and a default random generator.
      */
     public Ui() {
+        this(new Random());
+    }
+
+    /**
+     * Constructs a Ui object with a specified random generator for deterministic testing.
+     *
+     * @param random The random generator instance used for selecting phrases.
+     */
+    public Ui(Random random) {
+        assert random != null : "Random instance must not be null";
         this.scanner = new Scanner(System.in);
+        this.random = random;
     }
 
     /**
@@ -57,6 +180,30 @@ public class Ui {
     }
 
     /**
+     * Selects a random phrase from the given array of candidate phrase strings.
+     *
+     * @param phrases The array of candidate phrases.
+     * @return A randomly selected phrase.
+     */
+    private String getRandomPhrase(String[] phrases) {
+        assert phrases != null && phrases.length > 0 : "Phrases array cannot be null or empty";
+        int index = random.nextInt(phrases.length);
+        return phrases[index];
+    }
+
+    /**
+     * Selects a random template and formats it with the provided arguments.
+     *
+     * @param templates The array of candidate format templates.
+     * @param args The format arguments.
+     * @return The formatted string result.
+     */
+    private String getRandomFormattedPhrase(String[] templates, Object... args) {
+        String template = getRandomPhrase(templates);
+        return String.format(template, args);
+    }
+
+    /**
      * Formats a collection of tasks into a 1-based numbered list preceded by a header,
      * or returns the fallback message if the collection is empty.
      *
@@ -84,38 +231,40 @@ public class Ui {
     }
 
     /**
-     * Displays the welcome banner and returns the greeting message.
+     * Displays the welcome banner and returns a randomized greeting message.
      *
      * @return The welcome greeting string.
      */
     public String showWelcome() {
         showLine();
         System.out.println(BANNER);
-        printIndented("Hello! I'm Penny.\nWhat can I do for you?");
+        String welcome = getRandomPhrase(WELCOME_MESSAGES);
+        printIndented(welcome);
         showLine();
-        return "Hello! I'm Penny.\nWhat can I do for you?";
+        return welcome;
     }
 
     /**
-     * Displays and returns the goodbye exit message.
+     * Displays and returns a randomized goodbye exit message.
      *
      * @return The exit greeting string.
      */
     public String showGoodbye() {
-        String message = "Bye. Hope to see you again soon!";
+        String message = getRandomPhrase(GOODBYE_MESSAGES);
         printIndented(message);
         return message;
     }
 
     /**
-     * Displays and returns an error message with standard indentation.
+     * Displays and returns a randomized error message with standard indentation.
      *
      * @param message The message to display.
      * @return The error message string.
      */
     public String showError(String message) {
-        printIndented(message);
-        return message;
+        String response = getRandomFormattedPhrase(ERROR_TEMPLATES, message);
+        printIndented(response);
+        return response;
     }
 
     /**
@@ -125,7 +274,8 @@ public class Ui {
      * @return The loading error warning string.
      */
     public String showLoadingError(String message) {
-        String warning = "Warning: Could not read storage file (" + message + "). Starting with an empty list.";
+        String warning = "Warning: SP//dr could not read storage file (" + message
+                + "). Starting with an empty mission queue.";
         printIndented(warning);
         return warning;
     }
@@ -138,9 +288,7 @@ public class Ui {
      * @return The task added confirmation string.
      */
     public String showTaskAdded(Task task, int totalTasks) {
-        String response = "Got it. I've added this task:\n"
-                + "  " + task.toString() + "\n"
-                + "Now you have " + totalTasks + " tasks in the list.";
+        String response = getRandomFormattedPhrase(TASK_ADDED_TEMPLATES, task.toString(), totalTasks);
         printIndented(response);
         return response;
     }
@@ -152,8 +300,7 @@ public class Ui {
      * @return The marked task confirmation string.
      */
     public String showTaskMarked(Task task) {
-        String response = "Nice! I've marked this task as done:\n"
-                + "  " + task.toString();
+        String response = getRandomFormattedPhrase(TASK_MARKED_TEMPLATES, task.toString());
         printIndented(response);
         return response;
     }
@@ -165,8 +312,7 @@ public class Ui {
      * @return The unmarked task confirmation string.
      */
     public String showTaskUnmarked(Task task) {
-        String response = "OK, I've marked this task as not done yet:\n"
-                + "  " + task.toString();
+        String response = getRandomFormattedPhrase(TASK_UNMARKED_TEMPLATES, task.toString());
         printIndented(response);
         return response;
     }
@@ -179,9 +325,7 @@ public class Ui {
      * @return The task deleted confirmation string.
      */
     public String showTaskDeleted(Task task, int remainingTasks) {
-        String response = "Noted. I've removed this task:\n"
-                + "  " + task.toString() + "\n"
-                + "Now you have " + remainingTasks + " tasks in the list.";
+        String response = getRandomFormattedPhrase(TASK_DELETED_TEMPLATES, task.toString(), remainingTasks);
         printIndented(response);
         return response;
     }
@@ -193,7 +337,9 @@ public class Ui {
      * @return The task list string.
      */
     public String showTaskList(List<Task> tasks) {
-        return formatNumberedList("Here are the tasks in your list", tasks, "Your task list is empty.");
+        String header = getRandomPhrase(TASK_LIST_HEADERS);
+        String emptyMessage = getRandomPhrase(TASK_LIST_EMPTY_MESSAGES);
+        return formatNumberedList(header, tasks, emptyMessage);
     }
 
     /**
@@ -204,8 +350,9 @@ public class Ui {
      * @return The matching tasks string.
      */
     public String showTasksOnDate(List<Task> matchingTasks, String formattedDate) {
-        return formatNumberedList("Here are the tasks occurring on " + formattedDate,
-                matchingTasks, "No tasks found occurring on " + formattedDate + ".");
+        String header = getRandomFormattedPhrase(DATE_SEARCH_HEADERS, formattedDate);
+        String emptyMessage = getRandomFormattedPhrase(DATE_SEARCH_EMPTY_MESSAGES, formattedDate);
+        return formatNumberedList(header, matchingTasks, emptyMessage);
     }
 
     /**
@@ -216,8 +363,9 @@ public class Ui {
      * @return The matching tasks string.
      */
     public String showMatchingTasks(List<Task> matchingTasks, String keyword) {
-        return formatNumberedList("Here are the matching tasks in your list",
-                matchingTasks, "No matching tasks found for keyword: '" + keyword + "'.");
+        String header = getRandomFormattedPhrase(KEYWORD_SEARCH_HEADERS, keyword);
+        String emptyMessage = getRandomFormattedPhrase(KEYWORD_SEARCH_EMPTY_MESSAGES, keyword);
+        return formatNumberedList(header, matchingTasks, emptyMessage);
     }
 
     /**
