@@ -112,7 +112,7 @@ public class Penny {
      * @return The welcome greeting message.
      */
     public String getWelcomeMessage() {
-        return "Hello! I'm Penny.\nWhat can I do for you?";
+        return ui.showWelcome();
     }
 
     /**
