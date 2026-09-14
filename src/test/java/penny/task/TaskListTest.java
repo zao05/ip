@@ -149,6 +149,48 @@ public class TaskListTest {
     }
 
     @Test
+    public void findTasksByKeyword_emptyString_returnsEmptyList() {
+        List<Task> matchingTasks = taskList.findTasksByKeyword("");
+        assertTrue(matchingTasks.isEmpty());
+    }
+
+    @Test
+    public void findTasksByKeyword_multipleSpacesAndTabs_matches() {
+        List<Task> matchingTasks = taskList.findTasksByKeyword("  read \t   book  ");
+        assertEquals(1, matchingTasks.size());
+        assertEquals(sampleTodo, matchingTasks.get(0));
+    }
+
+    @Test
+    public void findTasksByKeyword_multipleTasksMatchingSharedPartialKeyword_returnsAllMatches() {
+        Todo anotherBookTodo = new Todo("return book to library");
+        taskList.add(anotherBookTodo);
+
+        List<Task> matchingTasks = taskList.findTasksByKeyword("boo");
+        assertEquals(2, matchingTasks.size());
+        assertEquals(sampleTodo, matchingTasks.get(0));
+        assertEquals(anotherBookTodo, matchingTasks.get(1));
+    }
+
+    @Test
+    public void findTasksByKeyword_infixSubstrings_matchesMiddleOfWords() {
+        List<Task> matchingTasks = taskList.findTasksByKeyword("ook");
+        assertEquals(1, matchingTasks.size());
+        assertEquals(sampleTodo, matchingTasks.get(0));
+
+        List<Task> deadlineMatches = taskList.findTasksByKeyword("mit sign");
+        assertEquals(1, deadlineMatches.size());
+        assertEquals(sampleDeadline, deadlineMatches.get(0));
+    }
+
+    @Test
+    public void findTasksByKeyword_mixedCasePartialKeywords_matches() {
+        List<Task> matchingTasks = taskList.findTasksByKeyword("ReAd BoO");
+        assertEquals(1, matchingTasks.size());
+        assertEquals(sampleTodo, matchingTasks.get(0));
+    }
+
+    @Test
     public void add_nullTask_assertionError() {
         assertThrows(AssertionError.class, () -> {
             taskList.add(null);
